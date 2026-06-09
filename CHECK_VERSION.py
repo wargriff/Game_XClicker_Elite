@@ -8,29 +8,28 @@ sys.path.insert(0, ROOT)
 
 FILES = [
     "START.bat",
+    "REPARER.bat",
     "gxclicker.py",
+    "main.py",
     "build.spec",
     "config/asset_system.py",
     "ui-web/index.html",
     "assets/brand/favicon.ico",
+    "services/bootstrap.py",
     "services/sidecar_api.py",
 ]
 
 DEAD = [
     "run.py",
-    "main.py",
     "launch.py",
     "BUILD.bat",
     "FIX_START.bat",
-    "scripts/repair_launchers.py",
     "launchers/START.bat",
-    "Xmacro_main.bat",
-    "xmacro_game.bat",
 ]
 
 
 def main() -> int:
-    print("=== Verification ===")
+    print("=== Verification Game XClicker Elite ===")
     ok = True
     for f in FILES:
         p = os.path.join(ROOT, f.replace("/", os.sep))
@@ -41,13 +40,16 @@ def main() -> int:
             ok = False
     for f in DEAD:
         if os.path.isfile(os.path.join(ROOT, f.replace("/", os.sep))):
-            print(f"[WARN] a supprimer: {f}")
-            ok = False
+            print(f"[WARN] obsolete — supprimez: {f}")
     if os.path.isfile(os.path.join(ROOT, "ui.py")):
         print("[WARN] ui.py present — START.bat le renomme")
-    print("\nLancement: START.bat  ou  python gxclicker.py")
-    print("PyCharm script: gxclicker.py  (PAS run.py)")
-    print("\nPRET" if ok else "\nINCOMPLET")
+    print()
+    if not ok:
+        print("INCOMPLET — double-cliquez REPARER.bat")
+        print("  ou: git pull origin cursor/icue-web-launcher-9626")
+    else:
+        print("PRET — double-clic START.bat")
+        print("PyCharm script: main.py")
     return 0 if ok else 1
 
 

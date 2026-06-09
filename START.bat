@@ -4,10 +4,10 @@ cd /d "%~dp0"
 
 echo ========================================
 echo   Game XClicker Elite — SOURIS WARGRIFF
-echo   Entree: gxclicker.py (pas run.py)
+echo   Entree: main.py / gxclicker.py
 echo ========================================
 
-REM --- Node.js C:\src (votre installation) ---
+REM --- Node.js C:\src ---
 set "XCLICKER_NODE_PATH=C:\src\node.exe"
 if exist "C:\src\node.exe" set "NODE=C:\src\node.exe"
 if not defined NODE if exist "C:\src\node\node.exe" set "NODE=C:\src\node\node.exe"
@@ -32,9 +32,17 @@ if exist "ui.py" if exist "ui\" (
 )
 
 if not exist "gxclicker.py" (
-    echo ERREUR: git pull origin cursor/icue-web-launcher-9626
+    echo.
+    echo ERREUR: gxclicker.py absent — projet pas a jour.
+    echo Lancez REPARER.bat une fois, puis relancez START.bat
+    echo.
     pause
     exit /b 1
+)
+
+if not exist "main.py" (
+    echo Creation main.py ...
+    "%PY%" -c "open('main.py','w',encoding='utf-8').write('from gxclicker import main\nimport sys\nsys.exit(main())\n')"
 )
 
 REM --- Fix conflit ui.py / dossier ui/ ---
@@ -42,6 +50,7 @@ REM --- Fix conflit ui.py / dossier ui/ ---
 
 if /I "%~1"=="build" goto build
 if /I "%~1"=="browser" goto runbrowser
+if /I "%~1"=="repair" goto repair
 
 set "EXE=%~dp0dist\Game XClicker Elite\Game XClicker Elite.exe"
 if exist "%EXE%" (
@@ -54,28 +63,31 @@ echo Installation dependances Python...
 "%PY%" -m pip install -r requirements.txt -q 2>nul
 
 if exist "nodejs\package.json" (
-    echo Installation Node.js (C:\src)...
+    echo Installation Node.js ...
     pushd nodejs
     if not exist node_modules (
         "%NODE%" --version 2>nul
         if errorlevel 1 (
             echo WARN: Node introuvable — UI via port 17840
         ) else (
-            call "%NODE%" "%~dp0nodejs\node_modules\npm\bin\npm-cli.js" install 2>nul
-            if errorlevel 1 call npm install --silent
+            call npm install --silent 2>nul
         )
     )
     popd
 )
 
-echo Lancement gxclicker.py ...
-"%PY%" gxclicker.py
+echo Lancement main.py ...
+"%PY%" main.py
 if errorlevel 1 pause
+exit /b %ERRORLEVEL%
+
+:repair
+call "%~dp0REPARER.bat"
 exit /b %ERRORLEVEL%
 
 :runbrowser
 set GX_BROWSER=1
-"%PY%" gxclicker.py
+"%PY%" main.py
 if errorlevel 1 pause
 exit /b %ERRORLEVEL%
 
