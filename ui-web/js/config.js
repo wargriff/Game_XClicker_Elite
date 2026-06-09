@@ -16,14 +16,15 @@ export const TABS = [
   { id: "dashboard", label: "DASHBOARD" },
   { id: "devices", label: "INSTANT LIGHTING" },
   { id: "settings", label: "SETTINGS" },
+  { id: "community", label: "COMMUNITY" },
 ];
 
 export const SIDEBAR = [
-  { type: "item", id: "performance", label: "PERFORMANCE" },
+  { type: "item", id: "performance", label: "PERFORMANCE", badge: "3" },
   { type: "item", id: "graphing", label: "GRAPHING" },
-  { type: "header", label: "LIGHTING SETUP" },
-  { type: "item", id: "channel1", label: "LIGHTING CHANNEL 1" },
-  { type: "item", id: "channel2", label: "LIGHTING CHANNEL 2" },
+  { type: "item", id: "lighting", label: "LIGHTING SETUP", icon: "⚡" },
+  { type: "item", id: "channel1", label: "LIGHTING CHANNEL 1", child: true, badge: "1", icon: "⚡" },
+  { type: "item", id: "channel2", label: "LIGHTING CHANNEL 2", child: true, badge: "1", icon: "⚡" },
   { type: "header", label: "MACROS" },
   { type: "item", id: "macro1", label: "MACRO 1 — Clic gauche", key: "left" },
   { type: "item", id: "macro2", label: "MACRO 2 — Clic droit", key: "right" },
@@ -43,6 +44,11 @@ export const DEVICES = [
   { id: "ram", icon: "▦" },
   { id: "commander", icon: "⬡" },
 ];
+
+export const CH1_TYPES = ["RGB Light Strip", "Commander Core", "Lighting Node PRO"];
+export const CH1_QTY = ["1 Strip is connected", "2 Strips are connected", "3 Strips are connected", "4 Strips are connected"];
+export const CH2_TYPES = ["LL Fan Hub", "QL Fan Hub", "RGB Light Strip"];
+export const CH2_QTY = ["1 Fan is connected", "2 Fans are connected", "3 Fans are connected", "4 Fans are connected"];
 
 export const LIGHTING_DEFAULTS = {
   ch1_type: "RGB Light Strip",

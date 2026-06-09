@@ -1,4 +1,4 @@
-import { TABS, SIDEBAR, DEVICES, LIGHTING_DEFAULTS, MACRO_KEYS, MACRO_LABELS } from "./config.js";
+import { TABS, SIDEBAR, DEVICES, LIGHTING_DEFAULTS, MACRO_KEYS, MACRO_LABELS, CH1_TYPES, CH1_QTY, CH2_TYPES, CH2_QTY } from "./config.js";
 import { getHealth, getMacros, updateMacro, toggleEngine } from "./api.js";
 
 const state = {
@@ -18,18 +18,22 @@ function buildShell() {
   const app = $("#app");
   app.innerHTML = `
     <header class="header">
-      <img class="brand-icon" src="/brand/favicon.svg" alt="SOURIS WARGRIFF" onerror="this.style.display='none'"/>
+      <div class="corsair-logo" title="XClicker Elite">⛵</div>
       ${TABS.map(t => `<button class="tab" data-tab="${t.id}">${t.label}</button>`).join("")}
       <div class="header-spacer"></div>
       <span class="status-pill" id="engineStatus">MOTEUR — STASE</span>
       <span class="cps-pill" id="cpsTotal">CPS Σ 0</span>
-      <button class="btn-stasis" id="btnStasis">SCEAU DE STASE</button>
+      <button class="btn-stasis" id="btnStasis" title="Toggle moteur">⏸</button>
+      <div class="win-controls">
+        <span class="win-btn">─</span>
+        <span class="win-btn">□</span>
+        <span class="win-btn win-close">✕</span>
+      </div>
     </header>
     <div class="body">
       <aside class="sidebar" id="sidebar"></aside>
       <main class="main" id="main"></main>
     </div>
-    <footer class="footer">Latéral 2 = pause globale · XButton1 = clavier · 6 macros actives</footer>
   `;
   buildSidebar();
   buildPages();
@@ -39,12 +43,17 @@ function buildShell() {
 function buildSidebar() {
   const sb = $("#sidebar");
   sb.innerHTML = `
-    <div class="sidebar-brand">
-      <img src="/brand/favicon.svg" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22/>'"/>
-      <h1>XCLICKER ELITE<br/>SOURIS WARGRIFF</h1>
+    <div class="profiles-block">
+      <div class="profiles-head">
+        <span class="profiles-label">PROFILES</span>
+        <button class="prof-btn" title="Ajouter">+</button>
+        <button class="prof-btn" title="Menu">☰</button>
+      </div>
+      <div class="profile-row active">
+        <img src="/brand/favicon.svg" class="profile-icon" alt="" onerror="this.style.visibility='hidden'"/>
+        <span>Default</span>
+      </div>
     </div>
-    <div class="profiles-label">PROFILES</div>
-    <select class="profile-select" id="profileSelect"><option>Default</option></select>
     <div id="navItems"></div>
   `;
 
@@ -53,9 +62,12 @@ function buildSidebar() {
     if (item.type === "header") {
       nav.insertAdjacentHTML("beforeend", `<div class="nav-header">${item.label}</div>`);
     } else {
+      const cls = ["nav-item", item.child ? "nav-child" : ""].filter(Boolean).join(" ");
+      const badge = item.badge ? `<span class="nav-badge">${item.badge}</span>` : "";
+      const icon = item.icon ? `<span class="nav-icon">${item.icon}</span>` : "";
       nav.insertAdjacentHTML(
         "beforeend",
-        `<button class="nav-item" data-section="${item.id}" data-key="${item.key || ""}">${item.label}</button>`
+        `<button class="${cls}" data-section="${item.id}" data-key="${item.key || ""}">${icon}<span class="nav-text">${item.label}</span>${badge}</button>`
       );
     }
   });
@@ -75,41 +87,42 @@ function buildPages() {
       <div class="cards-grid" id="dashCards"></div>
     </section>
     <section class="page visible" id="page-devices">
-      <div class="devices-bar">DEVICES</div>
-      <div class="device-strip" id="deviceStrip"></div>
-      <div class="device-center">
-        <div class="device-name" id="deviceName">COMMANDER PRO</div>
-        <div class="commander-box"></div>
-        <div class="ports">
-          <div class="port">TEMP<span>●</span></div>
-          <div class="port">USB<span>●</span></div>
-          <div class="port">LED<span>●</span></div>
-          <div class="port">FAN<span>●</span></div>
-        </div>
+      <div class="devices-bar">
+        <span>DEVICES</span>
+        <span class="devices-list-icon">☰</span>
       </div>
-      <div class="lighting-panel">
-        <div class="lighting-header">
-          <span class="lighting-title">✎ LIGHTING SETUP</span>
-          <button class="btn-revert" id="btnRevert">Revert</button>
-        </div>
-        <div class="lighting-body">
-          <div class="channel-row">
-            <span class="channel-label">Lighting Channel 1</span>
-            <select class="icue-select" id="ch1Type">
-              <option>RGB Light Strip</option><option>Commander Core</option>
-            </select>
-            <select class="icue-select" id="ch1Qty">
-              <option>4 Strips are connected</option><option>2 Strips are connected</option>
-            </select>
+      <div class="device-strip" id="deviceStrip"></div>
+      <div class="devices-body">
+        <div class="device-center">
+          <div class="device-name" id="deviceName">COMMANDER PRO</div>
+          <div class="commander-wrap">
+            <div class="commander-box">
+              <div class="commander-led"></div>
+            </div>
+            <div class="ports">
+              <div class="port"><small>LED</small><span>●</span></div>
+              <div class="port"><small>TEMP</small><span>●</span></div>
+              <div class="port"><small>USB</small><span>●</span></div>
+              <div class="port"><small>FAN</small><span>●</span></div>
+            </div>
           </div>
-          <div class="channel-row">
-            <span class="channel-label">Lighting Channel 2</span>
-            <select class="icue-select" id="ch2Type">
-              <option>LL Fan Hub</option><option>QL Fan Hub</option>
-            </select>
-            <select class="icue-select focus" id="ch2Qty">
-              <option>4 Fans are connected</option><option>2 Fans are connected</option>
-            </select>
+        </div>
+        <div class="lighting-panel">
+          <div class="lighting-header">
+            <span class="lighting-title">✎ LIGHTING SETUP</span>
+            <button class="btn-revert" id="btnRevert">Revert</button>
+          </div>
+          <div class="lighting-body">
+            <div class="channel-row">
+              <span class="channel-label">Lighting Channel 1</span>
+              <select class="icue-select" id="ch1Type">${CH1_TYPES.map(o=>`<option>${o}</option>`).join("")}</select>
+              <select class="icue-select" id="ch1Qty">${CH1_QTY.map(o=>`<option>${o}</option>`).join("")}</select>
+            </div>
+            <div class="channel-row">
+              <span class="channel-label">Lighting Channel 2</span>
+              <select class="icue-select" id="ch2Type">${CH2_TYPES.map(o=>`<option>${o}</option>`).join("")}</select>
+              <select class="icue-select focus" id="ch2Qty">${CH2_QTY.map(o=>`<option>${o}</option>`).join("")}</select>
+            </div>
           </div>
         </div>
       </div>
@@ -122,8 +135,15 @@ function buildPages() {
     </section>
     <section class="page" id="page-settings">
       <div class="cards-grid">
-        <div class="card"><h2>VERSION</h2><div class="val">3.0 Web</div></div>
+        <div class="card"><h2>VERSION</h2><div class="val">3.0 Web iCUE</div></div>
         <div class="card"><h2>API</h2><div class="val" id="apiStatus">—</div></div>
+        <div class="card"><h2>MOTEUR</h2><div class="val" id="settingsEngine">—</div></div>
+      </div>
+    </section>
+    <section class="page" id="page-community">
+      <div class="cards-grid">
+        <div class="card"><h2>COMMUNAUTÉ</h2><div class="val" style="font-size:1rem">GitHub wargriff</div></div>
+        <div class="card"><h2>SOURIS WARGRIFF</h2><div class="val" style="font-size:1rem">XClicker Elite</div></div>
       </div>
     </section>
   `;
@@ -208,33 +228,51 @@ function selectTab(tab) {
   state.tab = tab;
   $$(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
   $$(".page").forEach(p => p.classList.remove("visible"));
-  const pageId = tab === "devices" ? "devices" : tab;
-  $(`#page-${pageId}`)?.classList.add("visible");
 
-  if (tab === "devices") selectSection(state.section || "channel2");
+  if (tab === "devices") {
+    $("#page-devices")?.classList.add("visible");
+    selectSection(state.section || "lighting", "", false);
+    return;
+  }
+
+  $(`#page-${tab}`)?.classList.add("visible");
   if (tab === "home" || tab === "dashboard") fillStatusCards(tab);
 }
 
-function selectSection(section, key = "") {
+function selectSection(section, key = "", syncTab = true) {
   state.section = section;
-  $$(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.section === section));
+  $$(".nav-item").forEach(b => {
+    b.classList.toggle("active", b.dataset.section === section);
+  });
 
   if (section.startsWith("macro") || key) {
-    state.macroKey = key || state.macroKey;
-    selectTab("devices");
+    state.macroKey = key || macroKeyFromSection(section) || state.macroKey;
+    if (syncTab) {
+      $$(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === "devices"));
+    }
     showMacroPanel();
     return;
   }
 
   if (["performance", "graphing"].includes(section)) {
-    selectTab("dashboard");
+    if (syncTab) selectTab("dashboard");
     return;
   }
 
   if (["lighting", "channel1", "channel2"].includes(section)) {
-    selectTab("devices");
-    focusChannel(section === "channel1" ? 1 : section === "channel2" ? 2 : 0);
+    if (syncTab) {
+      $$(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === "devices"));
+      $$(".page").forEach(p => p.classList.remove("visible"));
+      $("#page-devices")?.classList.add("visible");
+    }
+    const ch = section === "channel1" ? 1 : section === "channel2" ? 2 : 0;
+    focusChannel(ch);
   }
+}
+
+function macroKeyFromSection(section) {
+  const map = { macro1: "left", macro2: "right", macro3: "1", macro4: "2", macro5: "3", macro6: "4" };
+  return map[section] || "";
 }
 
 function showMacroPanel() {
@@ -251,9 +289,9 @@ function highlightMacroCard(key) {
 }
 
 function focusChannel(n) {
-  ["ch1Qty", "ch2Qty"].forEach(id => $(`#${id}`)?.classList.remove("focus"));
-  if (n === 1) $("#ch1Qty")?.classList.add("focus");
-  if (n === 2) $("#ch2Qty")?.classList.add("focus");
+  ["ch1Type", "ch1Qty", "ch2Type", "ch2Qty"].forEach(id => $(`#${id}`)?.classList.remove("focus"));
+  if (n === 1) { $("#ch1Qty")?.classList.add("focus"); $("#ch1Type")?.classList.add("focus"); }
+  if (n === 2) { $("#ch2Qty")?.classList.add("focus"); $("#ch2Type")?.classList.add("focus"); }
 }
 
 function revertLighting() {
@@ -331,7 +369,7 @@ async function poll() {
 export function initApp() {
   buildShell();
   selectTab("devices");
-  selectSection("channel2");
+  selectSection("lighting");
   poll();
   setInterval(poll, state.pollMs);
 }

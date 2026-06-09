@@ -18,6 +18,7 @@ app.use(
   createProxyMiddleware({
     target: PYTHON_API,
     changeOrigin: true,
+    pathRewrite: (p) => (p.startsWith("/api") ? p : `/api${p}`),
     onError(err, _req, res) {
       console.error("[NODE] proxy error:", err.message);
       res.status(502).json({ status: "offline", error: err.message });

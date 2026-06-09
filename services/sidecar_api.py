@@ -77,6 +77,8 @@ class SidecarAPI:
 
             def do_GET(self):
                 path = urlparse(self.path).path.rstrip("/") or "/"
+                if path.startswith("/v1/"):
+                    path = "/api" + path
 
                 if path in ("/", "/app", "/mission"):
                     if os.path.exists(MISSION_HTML):
@@ -136,6 +138,8 @@ class SidecarAPI:
 
             def do_POST(self):
                 path = urlparse(self.path).path.rstrip("/")
+                if path.startswith("/v1/"):
+                    path = "/api" + path
                 data = self._read_json()
 
                 if path == "/api/v1/engine/toggle":
