@@ -1,8 +1,12 @@
 import os
 
-from PyQt6.QtCore import QTimer
+from PyQt6.QtCore import QObject, QTimer, pyqtSignal
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QMainWindow, QTabWidget
+
+
+class ToggleBridge(QObject):
+    macro_toggled = pyqtSignal(str, bool)
 
 from config_ui import CONFIG
 from rgb_engine import RGBEngine
@@ -69,7 +73,11 @@ class MainWindow(QMainWindow):
             idx = self.tabs.addTab(widget, label)
             self.tabs.setTabIcon(idx, _icon(icon_file))
 
-        engine.set_on_toggle(self._on_macro_toggle)
+        self._toggle_bridge = ToggleBridge()
+        self._toggle_bridge.macro_toggled.connect(self._on_macro_toggle)
+        engine.set_on_toggle(
+            lambda key, active: self._toggle_bridge.macro_toggled.emit(key, active)
+        )
 
         self.ui_timer = QTimer()
         self.ui_timer.timeout.connect(self.refresh_all)
@@ -105,9 +113,6 @@ class MainWindow(QMainWindow):
         self.mouse_tab.refresh()
         self.right_click_tab.refresh()
         self.keyboard_tab.refresh()
-        self.mouse_tab.panel.sync_from_engine()
-        self.right_click_tab.panel.sync_from_engine()
-        self.keyboard_tab.panel.sync_from_engine()
 
     def closeEvent(self, event):
         self.engine.running = False

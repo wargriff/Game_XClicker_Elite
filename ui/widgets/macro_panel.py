@@ -1,7 +1,8 @@
-from typing import Callable, Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
+    QButtonGroup,
     QHBoxLayout,
     QLabel,
     QPushButton,
@@ -49,17 +50,21 @@ class MacroPanel(QWidget):
         self.live.setStyleSheet("color:#00ff88;font-weight:bold;")
 
         self.burst_buttons = []
+        self.burst_group = None
         if show_burst:
             burst_row = QHBoxLayout()
             burst_lbl = QLabel("Burst à l'activation:")
             burst_lbl.setStyleSheet("color:#00ffaa;font-weight:bold;")
             layout.addWidget(burst_lbl)
+            self.burst_group = QButtonGroup(self)
+            self.burst_group.setExclusive(True)
             for val in (0, 5, 10, 20):
                 btn = QPushButton(str(val))
                 btn.setCheckable(True)
-                btn.clicked.connect(self._make_burst_handler(val))
+                self.burst_group.addButton(btn, val)
                 burst_row.addWidget(btn)
                 self.burst_buttons.append((val, btn))
+            self.burst_group.idClicked.connect(self._on_burst_selected)
             layout.addLayout(burst_row)
 
         def update_all():
@@ -101,12 +106,8 @@ class MacroPanel(QWidget):
         layout.addWidget(self.live)
         self.sync_from_engine()
 
-    def _make_burst_handler(self, val: int) -> Callable:
-        def handler():
-            for v, btn in self.burst_buttons:
-                btn.setChecked(v == val)
-            self.engine.set_burst_count(self.key, val)
-        return handler
+    def _on_burst_selected(self, val: int):
+        self.engine.set_burst_count(self.key, val)
 
     def sync_from_engine(self):
         btn = self.engine.buttons.get(self.key)
@@ -120,9 +121,13 @@ class MacroPanel(QWidget):
         self.delay_label.setText(f"{int(btn.delay * 1000)} ms")
         self.cps_slider.blockSignals(False)
         self.delay_slider.blockSignals(False)
-        burst = self.engine.get_burst_count(self.key)
-        for v, b in self.burst_buttons:
-            b.setChecked(v == burst)
+        if self.burst_group:
+            burst = self.engine.get_burst_count(self.key)
+            btn = self.burst_group.button(burst)
+            if btn:
+                self.burst_group.blockSignals(True)
+                btn.setChecked(True)
+                self.burst_group.blockSignals(False)
 
     def _apply_preset(self, cps: int, delay_ms: int):
         self.cps_slider.setValue(cps)

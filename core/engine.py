@@ -20,7 +20,9 @@ from core.win32_input import (
 
 GAME_SAFE_MAX_CPS = 30
 IGNORE_LEFT_MS = 0.05
-IGNORE_RIGHT_MS = 0.08
+IGNORE_RIGHT_MS = 0.15
+TOGGLE_COOLDOWN_MS = 0.30
+MIN_PRESS_MS = 0.05
 
 
 class BaseEngine:
@@ -116,6 +118,7 @@ class MouseEngine(BaseEngine):
         self._press_time = {"left": 0.0, "right": 0.0}
         self._ignore_until = {"left": 0.0, "right": 0.0}
         self._ignore_ms = {"left": IGNORE_LEFT_MS, "right": IGNORE_RIGHT_MS}
+        self._toggle_cooldown_until = {"left": 0.0, "right": 0.0}
         self._start()
         self._listener()
 
@@ -133,14 +136,28 @@ class MouseEngine(BaseEngine):
         burst = self.buttons[key].burst_count
         if burst <= 0:
             return
+        threading.Thread(
+            target=self._run_burst, args=(key, burst), daemon=True
+        ).start()
+
+    def _run_burst(self, key: str, burst: int):
         for _ in range(burst):
+            if not self.running:
+                return
             self._click(key)
             self._register(key)
-            time.sleep(0.01)
+            time.sleep(0.02)
 
     def _toggle_button(self, key: str):
+        now = time.perf_counter()
+        if now < self._toggle_cooldown_until[key]:
+            return
+
         btn = self.buttons[key]
         btn.active = not btn.active
+        self._toggle_cooldown_until[key] = now + TOGGLE_COOLDOWN_MS
+        self._ignore_until[key] = now + self._ignore_ms[key]
+
         if btn.active:
             self._fire_burst(key)
         self._notify_toggle(key, btn.active)
@@ -158,11 +175,13 @@ class MouseEngine(BaseEngine):
 
                 for key, pressed in (("left", l), ("right", r)):
                     if now <= self._ignore_until[key]:
+                        self._last_state[key] = pressed
                         continue
                     if pressed and not self._last_state[key]:
                         self._press_time[key] = now
                     if not pressed and self._last_state[key]:
-                        if now - self._press_time[key] > 0.02:
+                        hold = now - self._press_time[key]
+                        if hold >= MIN_PRESS_MS:
                             self._toggle_button(key)
 
                 self._last_state["left"] = l

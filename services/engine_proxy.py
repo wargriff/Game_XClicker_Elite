@@ -64,5 +64,7 @@ class EngineProxy:
             engine.buttons[key].active = state
 
     def is_active(self, key) -> bool:
-        btn = self.buttons.get(key)
-        return btn.active if btn else False
+        engine = self._get_engine(key)
+        if key in engine.buttons:
+            return engine.buttons[key].active
+        return False

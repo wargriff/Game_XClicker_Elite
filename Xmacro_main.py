@@ -10,9 +10,23 @@ from services.engine_proxy import EngineProxy
 from ui.main_window import MainWindow
 
 
+_original_excepthook = sys.excepthook
+_handling_fatal = False
+
+
 def handle_exception(exc_type, exc_value, exc_tb):
-    print("[FATAL ERROR]")
-    traceback.print_exception(exc_type, exc_value, exc_tb)
+    global _handling_fatal
+    if _handling_fatal:
+        _original_excepthook(exc_type, exc_value, exc_tb)
+        return
+    _handling_fatal = True
+    try:
+        print(f"[FATAL] {exc_type.__name__}: {exc_value}")
+        traceback.print_exception(exc_type, exc_value, exc_tb)
+    except Exception:
+        _original_excepthook(exc_type, exc_value, exc_tb)
+    finally:
+        _handling_fatal = False
 
 
 sys.excepthook = handle_exception
