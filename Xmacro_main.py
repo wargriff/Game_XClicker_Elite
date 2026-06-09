@@ -3,6 +3,12 @@ import signal
 import sys
 import traceback
 
+# Correctif global AVANT PyQt / UI (master_combo + name_edit)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import utils.legacy_patch  # noqa: F401, E402
+
+print("[XMACRO] launcher sanctuary v2.1 — si absent, mauvais script PyCharm!", flush=True)
+
 from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QApplication
 

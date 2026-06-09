@@ -1,6 +1,8 @@
 import os
 import webbrowser
 
+import utils.legacy_patch  # noqa: F401
+
 from PyQt6.QtCore import QTimer
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (

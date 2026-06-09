@@ -20,6 +20,13 @@ if exist "nodejs\package.json" (
 )
 
 echo === Verification ===
+python CHECK_VERSION.py
+if errorlevel 1 (
+    echo Echec verification — voir messages ci-dessus
+    pause
+    exit /b 1
+)
+
 findstr /C:"master_combo" ui\sanctuary_window.py >nul && echo [OK] sanctuary_window.py contient master_combo || echo [ERREUR] sanctuary_window.py ancien!
 findstr /C:"ui.main_window" Xmacro_main.py >nul && echo [OK] Xmacro_main.py import correct || echo [ERREUR] Xmacro_main.py ancien!
 

@@ -19,6 +19,22 @@ if exist "nodejs\package.json" (
     )
 )
 
+echo === Verification version ===
+if exist ".venv\Scripts\python.exe" (
+    ".venv\Scripts\python.exe" CHECK_VERSION.py
+) else if exist "venv\Scripts\python.exe" (
+    "venv\Scripts\python.exe" CHECK_VERSION.py
+) else (
+    python CHECK_VERSION.py
+)
+if errorlevel 1 (
+    echo.
+    echo CORRIGEZ avec: git pull origin cursor/sanctuary-diablo-ui-9626
+    pause
+    exit /b 1
+)
+
+echo === Lancement ===
 if exist ".venv\Scripts\python.exe" (
     ".venv\Scripts\python.exe" Xmacro_main.py
 ) else if exist "venv\Scripts\python.exe" (
