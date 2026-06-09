@@ -3,30 +3,35 @@
 block_cipher = None
 
 hidden = [
-    'psutil', 'webview', 'clr_loader',
+    'psutil', 'clr_loader',
+    'PyQt6', 'PyQt6.QtCore', 'PyQt6.QtGui', 'PyQt6.QtWidgets',
+    'native_app',
     'config', 'config.paths', 'config.asset_system', 'config.runtime',
     'services.bootstrap', 'services.sidecar_api', 'services.engine_proxy',
     'services.profile_manager', 'services.node_bridge', 'services.device_scanner',
+    'services.api_monitor',
     'core.engine', 'core.models', 'core.win32_input',
+    'ui.sanctuary_window', 'ui.splash_screen', 'ui.pages.home_page',
+    'rgb_engine',
 ]
 
 a = Analysis(
-    ['gxclicker.py'],
+    ['main.py'],
     pathex=[],
     binaries=[],
     datas=[
         ('assets', 'assets'),
-        ('ui-web', 'ui-web'),
         ('profiles', 'profiles'),
         ('config', 'config'),
         ('services', 'services'),
         ('core', 'core'),
+        ('ui', 'ui'),
     ],
     hiddenimports=hidden,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=['PyQt6', 'pytest', 'ui'],
+    excludes=['pytest', 'webview'],
     cipher=block_cipher,
     noarchive=False,
 )

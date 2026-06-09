@@ -146,7 +146,6 @@ class SanctuaryWindow(QMainWindow):
 
         self._connect_mission_control()
         self._bind_macro_attrs()
-        log("WINDOW", "master_combo/name_edit liés à la page macros")
 
     def _bind_macro_attrs(self):
         """Pointe master_combo / name_edit vers les widgets réels de MacrosPage."""
@@ -158,15 +157,7 @@ class SanctuaryWindow(QMainWindow):
         log_verbose("WINDOW", "_bind_macro_attrs OK")
 
     def _connect_mission_control(self):
-        mission = self.home._tiles.get("mission")
-        sidecar = self.home._tiles.get("sidecar")
-        node = self.home._tiles.get("node")
-        if mission:
-            mission.clicked.connect(self._open_mission_control)
-        if sidecar:
-            sidecar.clicked.connect(self._open_mission_control)
-        if node:
-            node.clicked.connect(self._open_mission_control)
+        pass
 
     def _mission_url(self) -> str:
         if self.node and self.node.online:
@@ -186,6 +177,7 @@ class SanctuaryWindow(QMainWindow):
         self.sidebar.profile_combo.currentTextChanged.connect(self._on_profile_change)
         self.sensor_panel.rescan_btn.clicked.connect(self._rescan_devices)
         self.devices.rescan_btn.clicked.connect(self._rescan_devices)
+        self.home.device_clicked.connect(self._on_home_device)
 
         self.engine.set_on_toggle(self._on_macro_toggle)
 
@@ -298,6 +290,23 @@ class SanctuaryWindow(QMainWindow):
 
     def _rescan_devices(self):
         self.sidebar.set_profiles(self.profiles.list_profiles())
+        if hasattr(self.home, "rescan_devices"):
+            self.home.rescan_devices()
+
+    def _on_home_device(self, device_id: str):
+        if device_id == "commander":
+            self.stack.setCurrentIndex(self.PAGE_MAP["devices"])
+            self.header._select_tab("devices", emit=False)
+            self.sidebar._select("lighting", emit=False)
+        elif device_id == "mouse":
+            self.stack.setCurrentIndex(self.PAGE_MAP["macros"])
+            self.header._select_tab("macros", emit=False)
+            self.sidebar._select("macro1", emit=False)
+            self._focus_macro_section("macro1")
+        elif device_id == "keyboard":
+            self.stack.setCurrentIndex(self.PAGE_MAP["macros"])
+            self.header._select_tab("macros", emit=False)
+            self.sidebar._select("macro3", emit=False)
 
     def _get_system_stats(self):
         try:

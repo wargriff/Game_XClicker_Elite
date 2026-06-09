@@ -76,7 +76,8 @@ if exist "nodejs\package.json" (
     popd
 )
 
-echo Lancement main.py ...
+echo Lancement interface native PyQt6 (main.py) ...
+echo   Mode web: START.bat browser
 "%PY%" main.py
 if errorlevel 1 pause
 exit /b %ERRORLEVEL%
@@ -87,7 +88,7 @@ exit /b %ERRORLEVEL%
 
 :runbrowser
 set GX_BROWSER=1
-"%PY%" main.py
+"%PY%" main.py --web
 if errorlevel 1 pause
 exit /b %ERRORLEVEL%
 

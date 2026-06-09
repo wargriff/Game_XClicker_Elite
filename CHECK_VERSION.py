@@ -9,8 +9,9 @@ sys.path.insert(0, ROOT)
 FILES = [
     "START.bat",
     "REPARER.bat",
-    "gxclicker.py",
     "main.py",
+    "native_app.py",
+    "gxclicker.py",
     "build.spec",
     "config/asset_system.py",
     "ui-web/index.html",
@@ -49,7 +50,8 @@ def main() -> int:
         print("  ou: git pull origin main")
     else:
         print("PRET — double-clic START.bat")
-        print("PyCharm script: main.py")
+        print("PyCharm script: main.py  (PyQt6 natif — pas pygame)")
+    print("Mode web optionnel: python main.py --web")
     return 0 if ok else 1
 
 

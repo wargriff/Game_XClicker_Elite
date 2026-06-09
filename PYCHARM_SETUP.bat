@@ -8,7 +8,8 @@ echo   Game XClicker Elite — Configuration PyCharm
 echo ============================================================
 echo.
 echo Script PyCharm : %~dp0main.py
-echo (main.py appelle gxclicker.py — ne cherchez plus run.py)
+echo Interface NATIVE PyQt6 iCUE (fenetre Windows — pas web, pas pygame)
+echo Mode web optionnel : python main.py --web
 echo.
 echo 1. Run - Edit Configurations
 echo 2. Supprimez les configs run.py / Xmacro_main.py

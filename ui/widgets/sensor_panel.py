@@ -58,6 +58,19 @@ class SensorPanel(QWidget):
         lbl.setText(f"{name}: {value}")
         lbl.setStyleSheet(f"color:{c}; font-size:11px;")
 
+    def update_from_scan(self, sensors: list):
+        for s in sensors:
+            label = s.get("label", "")
+            val = f"{s.get('value', '')}{s.get('unit', '')}"
+            if label.lower().startswith("load") or s.get("id") == "load":
+                self._set(self.cpu_lbl, "Load", val)
+            elif label.lower().startswith("vcpu") or s.get("id") == "vcpu":
+                self._set(self.ram_lbl, "VCPU", val)
+            elif "mem" in label.lower() or s.get("id") == "ram":
+                self._set(self.load_lbl, "Memory", val)
+            elif s.get("icon") == "temp":
+                self._set(self.api_lbl, label, val)
+
     def update_stats(
         self,
         cpu: float,
