@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Game XClicker Elite — entree unique (START.bat / .exe). Interface web iCUE."""
+"""Game XClicker Elite — START.bat / .exe"""
 
 from __future__ import annotations
 
 import os
 import sys
 import time
+import traceback
 import webbrowser
 
 
@@ -37,61 +38,88 @@ def _prepare() -> None:
             bak = ui_py + f".bak{n}"
         try:
             os.rename(ui_py, bak)
-        except OSError:
-            pass
-    if "ui" in sys.modules:
-        mod = sys.modules["ui"]
-        if (getattr(mod, "__file__", "") or "").replace("\\", "/").endswith("/ui.py"):
-            del sys.modules["ui"]
+            print(f"[GX] ui.py renomme -> {os.path.basename(bak)}")
+        except OSError as exc:
+            print(f"[GX] Fermez PyCharm puis: ren ui.py ui_old.py ({exc})")
 
 
-def _run_app() -> int:
-    from services.bootstrap import bootstrap
-
-    APP_TITLE = "Game XClicker Elite — SOURIS WARGRIFF"
-    ctx = None
+def _pick_url(ctx) -> str:
     url = "http://127.0.0.1:17840"
-    try:
-        ctx = bootstrap()
-        url = "http://127.0.0.1:5173"
-        if ctx.node:
-            deadline = time.time() + 6
-            while time.time() < deadline and not ctx.node.online:
-                time.sleep(0.2)
-            if not ctx.node.online:
-                url = "http://127.0.0.1:17840"
+    if ctx.node:
+        deadline = time.time() + 8
+        while time.time() < deadline and not ctx.node.online:
+            time.sleep(0.2)
+        if ctx.node.online:
+            return "http://127.0.0.1:5173"
+    print("[GX] Node.js absent — UI via Python port 17840")
+    return url
 
-        import webview
-        webview.create_window(
-            APP_TITLE, url,
-            width=1280, height=820,
-            min_size=(1024, 640),
-            background_color="#1a1a1a",
-        )
-        webview.start()
-    except ImportError:
-        webbrowser.open(url)
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            pass
-    except Exception as exc:
-        print(f"[GX] Erreur: {exc}")
-        input("Entree pour fermer...")
-        return 1
-    finally:
-        if ctx:
-            ctx.proxy.stop()
-            ctx.sidecar.stop()
-            if ctx.node:
-                ctx.node.stop()
+
+def _run_browser(url: str, ctx) -> int:
+    print(f"[GX] Ouverture navigateur → {url}")
+    webbrowser.open(url)
+    print("[GX] App active — fermez cette fenetre ou Ctrl+C pour quitter")
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        pass
     return 0
 
 
+def _run_webview(url: str) -> None:
+    import webview
+    webview.create_window(
+        "Game XClicker Elite — SOURIS WARGRIFF",
+        url,
+        width=1280,
+        height=820,
+        min_size=(1024, 640),
+        background_color="#1a1a1a",
+    )
+    webview.start()
+
+
 def main() -> int:
+    print("[GX] Demarrage Game XClicker Elite...")
     _prepare()
-    return _run_app()
+
+    ctx = None
+    url = "http://127.0.0.1:17840"
+    try:
+        from services.bootstrap import bootstrap
+        print("[GX] Moteur Win32 + API...")
+        ctx = bootstrap()
+        url = _pick_url(ctx)
+        print(f"[GX] Interface → {url}")
+
+        force_browser = "--browser" in sys.argv or os.environ.get("GX_BROWSER") == "1"
+        if force_browser:
+            return _run_browser(url, ctx)
+
+        try:
+            _run_webview(url)
+        except ImportError:
+            print("[GX] pywebview manquant — pip install pywebview")
+            return _run_browser(url, ctx)
+        except Exception as exc:
+            print(f"[GX] Fenetre native impossible ({exc}) — fallback navigateur")
+            return _run_browser(url, ctx)
+
+    except Exception:
+        traceback.print_exc()
+        input("\n[GX] ERREUR — Entree pour fermer...")
+        return 1
+    finally:
+        if ctx:
+            try:
+                ctx.proxy.stop()
+                ctx.sidecar.stop()
+                if ctx.node:
+                    ctx.node.stop()
+            except Exception:
+                pass
+    return 0
 
 
 if __name__ == "__main__":
