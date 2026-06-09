@@ -48,7 +48,7 @@ class Sidebar(QWidget):
 
         prof_lbl = QLabel("PROFILES")
         prof_lbl.setStyleSheet(
-            f"color:{COLORS['parchment_dim']}; font-size:10px; letter-spacing:1px;"
+            "color:#9a9a9a; font-size:10px; letter-spacing:1px;"
         )
         layout.addWidget(prof_lbl)
 
@@ -78,17 +78,16 @@ class Sidebar(QWidget):
     def _nav_style(self, active: bool) -> str:
         if active:
             return (
-                f"QPushButton {{ text-align:left; padding:8px 10px; border:none;"
-                f"border-left:3px solid {COLORS['gold']};"
-                f"background:rgba(60,45,20,0.35); color:{COLORS['gold_bright']};"
-                f"font-weight:600; border-radius:0; }}"
+                "QPushButton { text-align:left; padding:8px 10px; border:none;"
+                "border-left:3px solid #f5c518;"
+                "background:rgba(245,197,24,0.1); color:#f5c518;"
+                "font-weight:600; border-radius:0; font-size:11px; }"
             )
         return (
-            f"QPushButton {{ text-align:left; padding:8px 10px; border:none;"
-            f"border-left:3px solid transparent; background:transparent;"
-            f"color:{COLORS['parchment_dim']}; border-radius:0; }}"
-            f"QPushButton:hover {{ color:{COLORS['gold']};"
-            f"background:rgba(30,24,16,0.4); }}"
+            "QPushButton { text-align:left; padding:8px 10px; border:none;"
+            "border-left:3px solid transparent; background:transparent;"
+            "color:#9a9a9a; border-radius:0; font-size:11px; }"
+            "QPushButton:hover { color:#e0e0e0; background:rgba(255,255,255,0.05); }"
         )
 
     def _on_section_id_clicked(self, btn_id: int):

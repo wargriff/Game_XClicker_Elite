@@ -1,46 +1,77 @@
-from PyQt6.QtWidgets import QGridLayout, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
-from ui.tabs.rgb_tab import RGBTab
-from ui.widgets.device_tile import DeviceTile
+from rgb_engine import RGBEngine
+from ui.styles.icue_theme import ICUE
+from ui.widgets.device_center_view import DeviceCenterView
+from ui.widgets.device_strip import DeviceStrip
+from ui.widgets.lighting_setup_panel import LightingSetupPanel
 
 
 class DevicesPage(QWidget):
-    def __init__(self, engine, rgb, parent=None):
+    """Page DEVICES style Corsair iCUE — strip + vue hub + LIGHTING SETUP."""
+
+    def __init__(self, engine, rgb: RGBEngine, parent=None):
         super().__init__(parent)
         self.engine = engine
         self.rgb = rgb
-        self._tiles = {}
         self._build()
 
     def _build(self):
+        self.setStyleSheet(f"background:{ICUE['bg_main']};")
+
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(20, 16, 20, 16)
-        layout.setSpacing(12)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
-        grid = QGridLayout()
-        grid.setSpacing(10)
-        devices = [
-            ("mouse", "SOURIS", "Macro clic gauche/droit", "🖱"),
-            ("keyboard", "CLAVIER", "Touches 1-4", "⌨"),
-            ("side1", "LATÉRAL 1", "Toggle clavier", "◀"),
-            ("side2", "LATÉRAL 2", "Pause globale", "▶"),
-        ]
-        for i, (key, title, sub, icon) in enumerate(devices):
-            tile = DeviceTile(title, sub, icon)
-            self._tiles[key] = tile
-            grid.addWidget(tile, i // 2, i % 2)
+        top = QWidget()
+        top.setStyleSheet(f"background:{ICUE['bg_panel']};")
+        top.setFixedHeight(40)
+        top_row = QHBoxLayout(top)
+        top_row.setContentsMargins(16, 0, 16, 0)
+        title = QLabel("DEVICES")
+        title.setStyleSheet(
+            f"color:{ICUE['text']}; font-weight:600; letter-spacing:1px;"
+        )
+        top_row.addWidget(title)
+        top_row.addStretch()
+        self.rescan_btn = QPushButton("Rescanner périphériques")
+        self.rescan_btn.setStyleSheet(
+            f"background:transparent;border:1px solid {ICUE['border']};"
+            f"padding:4px 12px;color:{ICUE['text_dim']};font-size:11px;"
+        )
+        top_row.addWidget(self.rescan_btn)
+        layout.addWidget(top)
 
-        layout.addLayout(grid)
-        self.rgb_section = RGBTab(self.rgb)
-        layout.addWidget(self.rgb_section)
-        layout.addStretch()
+        self.device_strip = DeviceStrip()
+        layout.addWidget(self.device_strip)
+
+        self.device_view = DeviceCenterView()
+        layout.addWidget(self.device_view, 1)
+
+        self.lighting_panel = LightingSetupPanel()
+        layout.addWidget(self.lighting_panel)
+
+        self.device_strip.device_changed.connect(self.device_view.set_device)
+        self.lighting_panel.config_changed.connect(self._on_lighting_config)
+        self.lighting_panel.reverted.connect(self._on_revert)
+
+    def _on_lighting_config(self, channel: int, device_type: str, qty: str):
+        zone_map = {1: ("side1", "left"), 2: ("side2", "right")}
+        for zone in zone_map.get(channel, ()):
+            if zone in self.rgb.zones:
+                if "Fan" in device_type or "Hub" in device_type:
+                    self.rgb.set_mode(zone, "rainbow")
+                elif "Strip" in device_type:
+                    self.rgb.set_mode(zone, "breathing")
+                else:
+                    self.rgb.set_mode(zone, "static")
+
+    def _on_revert(self):
+        for zone in self.rgb.zones:
+            self.rgb.set_mode(zone, "static")
+
+    def focus_channel(self, channel: int):
+        self.lighting_panel.focus_channel(channel)
 
     def refresh(self):
-        self._tiles["mouse"].set_online(True, "Win32 OK")
-        self._tiles["keyboard"].set_online(True, "4 touches")
-        self._tiles["side1"].set_active(
-            any(self.engine.is_active(k) for k in ("1", "2", "3", "4")),
-            "XButton1",
-        )
-        self._tiles["side2"].set_active(self.engine.enabled, "XButton2 — toggle global")
-        self.rgb_section.refresh()
+        self.device_view.update()

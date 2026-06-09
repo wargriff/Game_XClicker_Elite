@@ -135,6 +135,8 @@ def main():
         utils.legacy_patch.hook_mainwindow_import()
         utils.legacy_patch.ensure_instance_legacy(window)
         _ensure_legacy_hooks(window)
+        if hasattr(window, "_bind_macro_attrs"):
+            window._bind_macro_attrs()
         log("XMACRO", f"MainWindow={type(window).__module__}.{type(window).__name__}")
         log("XMACRO", f"master_combo={window.master_combo is not None}")
         log("XMACRO", f"name_edit={window.name_edit is not None}")

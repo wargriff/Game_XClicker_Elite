@@ -197,6 +197,7 @@ class SanctuaryWindow(QMainWindow):
         self.sidebar.section_changed.connect(self._on_section)
         self.sidebar.profile_combo.currentTextChanged.connect(self._on_profile_change)
         self.sensor_panel.rescan_btn.clicked.connect(self._rescan_devices)
+        self.devices.rescan_btn.clicked.connect(self._rescan_devices)
 
         self.engine.set_on_toggle(self._on_macro_toggle)
 
@@ -246,6 +247,10 @@ class SanctuaryWindow(QMainWindow):
             elif section in ("lighting", "channel1", "channel2"):
                 self.stack.setCurrentIndex(self.PAGE_MAP["devices"])
                 self.header._select_tab("devices", emit=False)
+                if section == "channel1":
+                    QTimer.singleShot(0, lambda: self.devices.focus_channel(1))
+                elif section == "channel2":
+                    QTimer.singleShot(0, lambda: self.devices.focus_channel(2))
             elif section in ("macro1", "macro2"):
                 self.stack.setCurrentIndex(self.PAGE_MAP["macros"])
                 self.header._select_tab("macros", emit=False)

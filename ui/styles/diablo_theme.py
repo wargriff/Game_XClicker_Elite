@@ -177,10 +177,13 @@ TILE_STYLE = f"""
 
 SIDEBAR_STYLE = f"""
     Sidebar {{
-        background: rgba(10, 8, 6, 0.92);
-        border-right: 1px solid {COLORS['border']};
+        background: #1e1e1e;
+        border-right: 1px solid #3a3a3a;
     }}
 """
+
+ICUE_SIDEBAR_STYLE = SIDEBAR_STYLE
+
 
 HEADER_STYLE = f"""
     HeaderBar {{
