@@ -9,3 +9,5 @@ dist/
 *.pyc
 *.exe
 *.db
+ui.py.bak*
+ui.py.old*
