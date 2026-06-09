@@ -3,30 +3,32 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
-    QStackedWidget,
     QVBoxLayout,
     QWidget,
 )
 
+from config_ui import PRESETS, RIGHT_CLICK_PRESETS
 from ui.styles.diablo_theme import COLORS
-from ui.tabs.keyboard_tab import KeyboardTab
-from ui.tabs.mouse_tab import MouseTab
-from ui.tabs.right_click_tab import RightClickTab
+from ui.widgets.macro_panel import MacroPanel
+from ui.widgets.status_card import StatusCard
 
-
-MACRO_SLOTS = [
+MACRO_KEYS = [
     ("left", "Macro 1 — Clic gauche"),
     ("right", "Macro 2 — Clic droit"),
-    ("keyboard", "Clavier — touches 1-4"),
+    ("1", "Clavier — Touche 1"),
+    ("2", "Clavier — Touche 2"),
+    ("3", "Clavier — Touche 3"),
+    ("4", "Clavier — Touche 4"),
 ]
 
 
 class MacrosPage(QWidget):
-    """Macros page with master_combo / name_edit for Sanctuary compatibility."""
+    """Page macros autonome — master_combo + name_edit requis par l'UI Sanctuary."""
 
     def __init__(self, engine, parent=None):
         super().__init__(parent)
         self.engine = engine
+        self._current_key = "left"
         self._updating = False
         self._build()
 
@@ -49,7 +51,6 @@ class MacrosPage(QWidget):
         name_lbl.setStyleSheet(f"color:{COLORS['parchment_dim']};")
         self.name_edit = QLineEdit("default")
         self.name_edit.setReadOnly(True)
-        self.name_edit.setPlaceholderText("Nom du profil macro")
         self.name_edit.setStyleSheet(
             f"background:rgba(18,16,14,0.95); border:1px solid {COLORS['border']};"
             f"padding:6px; color:{COLORS['parchment']};"
@@ -58,12 +59,8 @@ class MacrosPage(QWidget):
         master_lbl = QLabel("Canal:")
         master_lbl.setStyleSheet(f"color:{COLORS['parchment_dim']};")
         self.master_combo = QComboBox()
-        for _, label in MACRO_SLOTS:
+        for _, label in MACRO_KEYS:
             self.master_combo.addItem(label)
-        self.master_combo.setStyleSheet(
-            f"background:rgba(18,16,14,0.95); border:1px solid {COLORS['border']};"
-            f"padding:4px; color:{COLORS['parchment']}; min-width:220px;"
-        )
 
         top.addWidget(name_lbl)
         top.addWidget(self.name_edit, 1)
@@ -71,50 +68,70 @@ class MacrosPage(QWidget):
         top.addWidget(self.master_combo, 1)
         layout.addLayout(top)
 
-        self.stack = QStackedWidget()
-        self.mouse_tab = MouseTab(self.engine)
-        self.right_tab = RightClickTab(self.engine)
-        self.keyboard_tab = KeyboardTab(self.engine)
-        self.stack.addWidget(self.mouse_tab)
-        self.stack.addWidget(self.right_tab)
-        self.stack.addWidget(self.keyboard_tab)
-        layout.addWidget(self.stack, 1)
+        self.status = StatusCard("Macro")
+        layout.addWidget(self.status)
+
+        presets = {k: (c, int(d * 1000)) for k, (c, d) in PRESETS.items()}
+        self.panel = MacroPanel(
+            self.engine,
+            "left",
+            presets=presets,
+            show_burst=True,
+        )
+        layout.addWidget(self.panel)
+        layout.addStretch()
 
         self.master_combo.currentIndexChanged.connect(self._on_master_changed)
+
+    def _key_for_index(self, index: int) -> str:
+        index = max(0, min(index, len(MACRO_KEYS) - 1))
+        return MACRO_KEYS[index][0]
+
+    def _index_for_key(self, key: str) -> int:
+        for i, (k, _) in enumerate(MACRO_KEYS):
+            if k == key:
+                return i
+        return 0
 
     def _on_master_changed(self, index: int):
         if self._updating:
             return
-        self.stack.setCurrentIndex(index)
+        key = self._key_for_index(index)
+        self._switch_key(key)
+
+    def _switch_key(self, key: str):
+        self._current_key = key
+        self.panel.key = key
+        self.panel.sync_from_engine()
+        self.status.title.setText(f"Macro — {key}")
+        self.refresh()
 
     def set_profile_name(self, name: str):
         self.name_edit.setText(name or "default")
 
     def focus_section(self, section: str):
         mapping = {
-            "macro1": 0,
-            "macro2": 1,
-            "channel1": 0,
-            "channel2": 1,
-            "keyboard": 2,
+            "macro1": "left",
+            "macro2": "right",
+            "channel1": "left",
+            "channel2": "right",
+            "keyboard": "1",
         }
-        idx = mapping.get(section, 0)
+        key = mapping.get(section, "left")
+        idx = self._index_for_key(key)
         self._updating = True
         try:
             self.master_combo.blockSignals(True)
             self.master_combo.setCurrentIndex(idx)
             self.master_combo.blockSignals(False)
-            self.stack.setCurrentIndex(idx)
+            self._switch_key(key)
         finally:
             self._updating = False
 
     def refresh(self):
-        try:
-            self.mouse_tab.refresh()
-            self.right_tab.refresh()
-            self.keyboard_tab.refresh()
-            self.mouse_tab.panel.sync_from_engine()
-            self.right_tab.panel.sync_from_engine()
-            self.keyboard_tab.panel.sync_from_engine()
-        except Exception as exc:
-            print(f"[MACROS] refresh skipped: {exc}")
+        key = self._current_key
+        active = self.engine.is_active(key)
+        real = self.engine.get_real_cps(key)
+        target = self.engine.get_cps(key)
+        self.status.set_active(active, f"CPS {real} / cible {target}")
+        self.panel.update_live_cps()

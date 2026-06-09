@@ -1,6 +1,5 @@
 import ctypes
-
-user32 = ctypes.windll.user32
+import sys
 
 MOUSEEVENTF_LEFTDOWN = 0x0002
 MOUSEEVENTF_LEFTUP = 0x0004
@@ -17,6 +16,20 @@ INPUT_MOUSE = 0
 INPUT_KEYBOARD = 1
 
 ULONG_PTR = ctypes.c_ulonglong
+
+
+class _Win32Stub:
+    def GetAsyncKeyState(self, _vk):
+        return 0
+
+    def SendInput(self, *_args, **_kwargs):
+        return 1
+
+
+if sys.platform == "win32":
+    user32 = ctypes.windll.user32
+else:
+    user32 = _Win32Stub()
 
 
 class MOUSEINPUT(ctypes.Structure):

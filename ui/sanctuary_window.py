@@ -111,15 +111,9 @@ class SanctuaryWindow(QMainWindow):
 
         self._connect_mission_control()
 
-    @property
-    def master_combo(self):
-        """Legacy hook used by macro refresh handlers."""
-        return self.macros.master_combo
-
-    @property
-    def name_edit(self):
-        """Legacy hook used by macro refresh handlers."""
-        return self.macros.name_edit
+        # Attributs directs (compatibilité hooks macro legacy)
+        self.master_combo = self.macros.master_combo
+        self.name_edit = self.macros.name_edit
 
     def _connect_mission_control(self):
         mission = self.home._tiles.get("mission")

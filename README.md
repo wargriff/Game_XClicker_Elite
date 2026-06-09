@@ -292,8 +292,20 @@ pyinstaller --onefile --windowed --name Game_XClicker_Elite ^
 # Tests
 
 ```bash
-pytest
+pip install -r requirements.txt
+pytest tests/ -v
 ```
+
+Sur Windows (avec écran), tous les tests UI s'exécutent. Sur Linux CI, les tests moteur/API passent ; les tests PyQt6 sont ignorés si l'affichage n'est pas disponible.
+
+Tests couverts :
+- Moteur macro + proxy
+- Profils JSON
+- API Sidecar
+- Onglets header (HOME, DASHBOARD, DEVICES, **MACROS**, SETTINGS)
+- Sidebar (PERFORMANCE, MACRO 1/2, etc.)
+- Boutons burst sans récursion
+- Attributs `master_combo` / `name_edit`
 
 ---
 

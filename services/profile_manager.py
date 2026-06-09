@@ -1,11 +1,11 @@
 import json
 import os
-from typing import Any, Dict, List, Optional
-
-from PyQt6.QtGui import QColor
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from core.engine import MacroManager
-from rgb_engine import RGBEngine
+
+if TYPE_CHECKING:
+    from rgb_engine import RGBEngine
 
 
 class ProfileManager:
@@ -57,7 +57,9 @@ class ProfileManager:
             if "burst_count" in cfg:
                 engine.set_burst_count(key, cfg["burst_count"])
 
-    def apply_to_rgb(self, rgb: RGBEngine) -> None:
+    def apply_to_rgb(self, rgb: "RGBEngine") -> None:
+        from PyQt6.QtGui import QColor
+
         zones = self._data.get("rgb", {})
         for zone, cfg in zones.items():
             if zone not in rgb.zones:
@@ -79,7 +81,7 @@ class ProfileManager:
                 }
         self._data.setdefault("macro", {})["buttons"] = buttons
 
-    def capture_from_rgb(self, rgb: RGBEngine) -> None:
+    def capture_from_rgb(self, rgb: "RGBEngine") -> None:
         zones = {}
         for name, zone in rgb.zones.items():
             c = zone.color
