@@ -7,7 +7,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Optional
 from urllib.parse import parse_qs, urlparse
 
-from config.paths import BRAND_DIR, UI_WEB_DIR
+from config.paths import BRAND_DIR, DEVICES_DIR, UI_WEB_DIR
+from services.device_scanner import scan_devices, scan_sensors
 
 MISSION_HTML = os.path.join(UI_WEB_DIR, "index.html")
 
@@ -103,6 +104,8 @@ class SidecarAPI:
                     fp = os.path.join(UI_WEB_DIR, path[1:])
                 elif path.startswith("/brand/"):
                     fp = os.path.join(BRAND_DIR, path[7:])
+                elif path.startswith("/devices/"):
+                    fp = os.path.join(DEVICES_DIR, path[9:])
                 else:
                     return False
                 if os.path.isfile(fp):
@@ -170,6 +173,15 @@ class SidecarAPI:
 
                 if path == "/api/v1/profiles" and profiles:
                     self._json(200, {"profiles": profiles.list_profiles()})
+                    return
+
+                if path == "/api/v1/devices":
+                    devices = scan_devices(engine)
+                    self._json(200, {"devices": devices, "count": len(devices)})
+                    return
+
+                if path == "/api/v1/sensors":
+                    self._json(200, {"sensors": scan_sensors()})
                     return
 
                 self._json(404, {"error": "not found"})

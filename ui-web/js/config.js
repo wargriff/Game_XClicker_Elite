@@ -67,3 +67,12 @@ export const MACRO_LABELS = {
   3: "Macro 5 — Touche 3",
   4: "Macro 6 — Touche 4",
 };
+
+export const MURALS = [
+  { id: "yellow", label: "CORSAIR Yellow", gradient: "linear-gradient(135deg,#f5c518,#8a6d00)" },
+  { id: "rainbow", label: "Rainbow", gradient: "linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f)" },
+  { id: "abstract", label: "Abstract", gradient: "linear-gradient(160deg,#1a1a2e,#16213e,#0f3460)" },
+  { id: "fire", label: "Inferno", gradient: "linear-gradient(135deg,#ff4500,#8b0000,#1a1a1a)" },
+  { id: "ice", label: "Arctic", gradient: "linear-gradient(135deg,#a8d8ff,#004e89,#001233)" },
+  { id: "neon", label: "Neon", gradient: "linear-gradient(135deg,#00ff88,#0088ff,#8800ff)" },
+];

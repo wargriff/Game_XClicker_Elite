@@ -6,7 +6,7 @@ hidden = [
     'psutil', 'webview', 'clr_loader',
     'config', 'config.paths', 'config.asset_system', 'config.runtime',
     'services.bootstrap', 'services.sidecar_api', 'services.engine_proxy',
-    'services.profile_manager', 'services.node_bridge',
+    'services.profile_manager', 'services.node_bridge', 'services.device_scanner',
     'core.engine', 'core.models', 'core.win32_input',
 ]
 

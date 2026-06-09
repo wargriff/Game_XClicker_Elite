@@ -35,3 +35,13 @@ export async function getProfiles() {
   const r = await fetch(`${BASE}/profiles`);
   return r.json();
 }
+
+export async function getDevices() {
+  const r = await fetch(`${BASE}/devices`);
+  return r.json();
+}
+
+export async function getSensors() {
+  const r = await fetch(`${BASE}/sensors`);
+  return r.json();
+}

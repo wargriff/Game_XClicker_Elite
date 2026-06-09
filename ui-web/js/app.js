@@ -1,13 +1,15 @@
-import { TABS, SIDEBAR, DEVICES, LIGHTING_DEFAULTS, MACRO_KEYS, MACRO_LABELS, CH1_TYPES, CH1_QTY, CH2_TYPES, CH2_QTY } from "./config.js";
-import { getHealth, getMacros, updateMacro, toggleEngine } from "./api.js";
+import { TABS, SIDEBAR, DEVICES, LIGHTING_DEFAULTS, MACRO_KEYS, MACRO_LABELS, CH1_TYPES, CH1_QTY, CH2_TYPES, CH2_QTY, MURALS } from "./config.js";
+import { getHealth, getMacros, updateMacro, toggleEngine, getDevices, getSensors } from "./api.js";
 
 const state = {
-  tab: "devices",
+  tab: "home",
   section: "channel2",
   device: "commander",
   macroKey: "left",
   engine: false,
   macros: {},
+  devices: [],
+  sensors: [],
   pollMs: 500,
 };
 
@@ -80,13 +82,36 @@ function buildSidebar() {
 function buildPages() {
   const main = $("#main");
   main.innerHTML = `
-    <section class="page" id="page-home">
-      <div class="cards-grid" id="homeCards"></div>
+    <section class="page visible" id="page-home">
+      <div class="home-layout">
+        <div class="profile-rail" id="profileRail"></div>
+        <div class="home-content">
+          <div class="home-columns">
+            <div class="home-left">
+              <div class="widget-block">
+                <div class="widget-head">MURALS</div>
+                <div class="murals-grid" id="muralsGrid"></div>
+              </div>
+              <div class="widget-block">
+                <div class="widget-head">SENSORS</div>
+                <div class="sensors-grid" id="sensorsGrid"></div>
+              </div>
+            </div>
+            <div class="home-right">
+              <div class="widget-head devices-head">
+                <span>DEVICES</span>
+                <span class="detect-badge" id="detectCount">0 détectés</span>
+              </div>
+              <div class="device-grid" id="deviceGrid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
     <section class="page" id="page-dashboard">
       <div class="cards-grid" id="dashCards"></div>
     </section>
-    <section class="page visible" id="page-devices">
+    <section class="page" id="page-devices">
       <div class="devices-bar">
         <span>DEVICES</span>
         <span class="devices-list-icon">☰</span>
@@ -161,6 +186,91 @@ function buildPages() {
 
   $("#btnRevert").addEventListener("click", revertLighting);
   buildMacroCards();
+  buildHomeWidgets();
+}
+
+function buildHomeWidgets() {
+  const rail = $("#profileRail");
+  rail.innerHTML = `
+    <button class="rail-toggle" title="Profils">›</button>
+    <button class="hex-profile active" title="Default"><img src="/brand/favicon.svg" alt="" onerror="this.parentElement.textContent='D'"/></button>
+    <button class="hex-profile" title="Gaming">G</button>
+    <button class="hex-profile" title="Diablo">⚔</button>
+    <button class="hex-add" title="Ajouter">+</button>
+  `;
+
+  $("#muralsGrid").innerHTML = MURALS.map(m => `
+    <button class="mural-tile" data-mural="${m.id}" style="background:${m.gradient}" title="${m.label}">
+      <span>${m.label}</span>
+    </button>
+  `).join("");
+
+  renderSensors([]);
+  renderDeviceGrid([]);
+}
+
+const SENSOR_ICONS = { chart: "📊", bolt: "⚡", ram: "▦", temp: "🌡" };
+
+function renderSensors(list) {
+  const grid = $("#sensorsGrid");
+  if (!grid) return;
+  if (!list.length) {
+    grid.innerHTML = `<div class="sensor-empty">Scan capteurs…</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(s => `
+    <article class="sensor-card">
+      <div class="sensor-icon">${SENSOR_ICONS[s.icon] || "●"}</div>
+      <div class="sensor-body">
+        <div class="sensor-label">${s.label}</div>
+        <div class="sensor-value">${s.value}<small>${s.unit || ""}</small></div>
+        <div class="sensor-detail">${s.detail || ""}</div>
+      </div>
+    </article>
+  `).join("");
+}
+
+function renderDeviceGrid(list) {
+  const grid = $("#deviceGrid");
+  const badge = $("#detectCount");
+  if (!grid) return;
+  const detected = list.filter(d => d.detected);
+  if (badge) badge.textContent = `${detected.length} détecté${detected.length > 1 ? "s" : ""}`;
+
+  if (!list.length) {
+    grid.innerHTML = `<div class="device-empty">Détection automatique…</div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(d => `
+    <article class="device-card${d.id === state.device ? " selected" : ""}" data-device="${d.id}">
+      <div class="device-card-head">
+        <span class="device-card-name">${d.name}</span>
+        <button class="device-gear" title="Configurer">⚙</button>
+      </div>
+      <div class="device-card-img">
+        <img src="${d.image}" alt="${d.name}" onerror="this.src='/devices/mouse.svg'"/>
+      </div>
+      <div class="device-card-foot">
+        <span class="status-dot ${d.online ? "online" : "offline"}"></span>
+        <span class="device-detail">${d.detail || ""}</span>
+      </div>
+    </article>
+  `).join("");
+
+  $$(".device-card", grid).forEach(card => {
+    card.addEventListener("click", (e) => {
+      if (e.target.closest(".device-gear")) return;
+      openDeviceDetail(card.dataset.device);
+    });
+  });
+}
+
+function openDeviceDetail(id) {
+  selectDevice(id);
+  selectTab("devices");
+  if (id === "commander") selectSection("lighting");
+  else if (id === "mouse") selectSection("macro1", "left");
 }
 
 function buildMacroCards() {
@@ -228,6 +338,13 @@ function selectTab(tab) {
   state.tab = tab;
   $$(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
   $$(".page").forEach(p => p.classList.remove("visible"));
+
+  if (tab === "home") {
+    $("#page-home")?.classList.add("visible");
+    renderDeviceGrid(state.devices);
+    renderSensors(state.sensors);
+    return;
+  }
 
   if (tab === "devices") {
     $("#page-devices")?.classList.add("visible");
@@ -341,7 +458,19 @@ async function poll() {
     updateEngineUI();
     $("#apiStatus") && ($("#apiStatus").textContent = "OK");
 
-    const { macros } = await getMacros();
+    const [{ macros }, devRes, sensRes] = await Promise.all([
+      getMacros(),
+      getDevices().catch(() => ({ devices: [] })),
+      getSensors().catch(() => ({ sensors: [] })),
+    ]);
+
+    state.devices = devRes.devices || [];
+    state.sensors = sensRes.sensors || [];
+    if (state.tab === "home") {
+      renderDeviceGrid(state.devices);
+      renderSensors(state.sensors);
+    }
+
     macros.forEach(m => {
       state.macros[m.key] = m;
       refreshMacroCard(m.key, m);
@@ -368,8 +497,7 @@ async function poll() {
 
 export function initApp() {
   buildShell();
-  selectTab("devices");
-  selectSection("lighting");
+  selectTab("home");
   poll();
   setInterval(poll, state.pollMs);
 }
