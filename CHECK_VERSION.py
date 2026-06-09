@@ -8,6 +8,10 @@ sys.path.insert(0, ROOT)
 
 FILES = [
     "START.bat",
+    "LAUNCH_NATIVE.bat",
+    "LAUNCH_WEB.bat",
+    "BUILD.bat",
+    "LAUNCH_EXE.bat",
     "REPARER.bat",
     "main.py",
     "native_app.py",
@@ -23,7 +27,6 @@ FILES = [
 DEAD = [
     "run.py",
     "launch.py",
-    "BUILD.bat",
     "FIX_START.bat",
     "launchers/START.bat",
 ]

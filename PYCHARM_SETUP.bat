@@ -17,8 +17,15 @@ echo 3. Nouvelle config Python :
 echo    Script path : main.py
 echo    Working directory : %~dp0
 echo.
-echo    Import : pycharm\Game_XClicker_Elite.run.xml
+echo 4. Lanceurs Windows (double-clic):
+echo    LAUNCH_NATIVE.bat  — controle PyQt6 (.py)
+echo    LAUNCH_WEB.bat     — preview web
+echo    BUILD.bat          — creer .exe
+echo    LAUNCH_EXE.bat     — lancer .exe
+echo    START.bat          — menu
 echo.
-echo 4. Si gxclicker.py introuvable : REPARER.bat
+echo 5. PyCharm — 2 configs dans pycharm\Game_XClicker_Elite.run.xml:
+echo    Native PyQt6  ^(main.py^)
+echo    Web preview   ^(main.py --web^)
 echo.
 pause
