@@ -73,11 +73,13 @@ def _needs_repair_run(path: str) -> bool:
         s = line.strip()
         if s.startswith("#") or not s:
             continue
+        if s.startswith("from gxclicker import main"):
+            return False
         if s == "from main import main" or s.startswith("from main import "):
             return True
-        if "ui.asset_system" in s and not s.startswith('"""') and not s.startswith("'''"):
+        if s.startswith("from ui.") or s.startswith("import ui"):
             return True
-    return False
+    return True
 
 
 def _needs_repair_main(path: str) -> bool:
