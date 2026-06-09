@@ -1,8 +1,8 @@
 {
-  "name": "xclicker-node-bridge",
-  "version": "2.1.0",
+  "name": "xclicker-elite-ui",
+  "version": "3.0.0",
   "private": true,
-  "description": "Mission Control + API bridge for Game XClicker Elite",
+  "description": "Interface iCUE JS + bridge API Python",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

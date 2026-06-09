@@ -1,0 +1,63 @@
+/** Configuration partagée — 6 macros + navigation iCUE */
+
+export const ICUE = {
+  bgMain: "#1a1a1a",
+  bgPanel: "#242424",
+  bgRow: "#2d2d2d",
+  bgInput: "#1e1e1e",
+  border: "#3a3a3a",
+  yellow: "#f5c518",
+  text: "#e0e0e0",
+  textDim: "#9a9a9a",
+};
+
+export const TABS = [
+  { id: "home", label: "HOME" },
+  { id: "dashboard", label: "DASHBOARD" },
+  { id: "devices", label: "INSTANT LIGHTING" },
+  { id: "settings", label: "SETTINGS" },
+];
+
+export const SIDEBAR = [
+  { type: "item", id: "performance", label: "PERFORMANCE" },
+  { type: "item", id: "graphing", label: "GRAPHING" },
+  { type: "header", label: "LIGHTING SETUP" },
+  { type: "item", id: "channel1", label: "LIGHTING CHANNEL 1" },
+  { type: "item", id: "channel2", label: "LIGHTING CHANNEL 2" },
+  { type: "header", label: "MACROS" },
+  { type: "item", id: "macro1", label: "MACRO 1 — Clic gauche", key: "left" },
+  { type: "item", id: "macro2", label: "MACRO 2 — Clic droit", key: "right" },
+  { type: "item", id: "macro3", label: "MACRO 3 — Touche 1", key: "1" },
+  { type: "item", id: "macro4", label: "MACRO 4 — Touche 2", key: "2" },
+  { type: "item", id: "macro5", label: "MACRO 5 — Touche 3", key: "3" },
+  { type: "item", id: "macro6", label: "MACRO 6 — Touche 4", key: "4" },
+];
+
+export const DEVICES = [
+  { id: "keyboard", icon: "⌨" },
+  { id: "mouse", icon: "🖱" },
+  { id: "headset", icon: "🎧" },
+  { id: "stand", icon: "🎤" },
+  { id: "pad", icon: "▭" },
+  { id: "fan", icon: "🌀" },
+  { id: "ram", icon: "▦" },
+  { id: "commander", icon: "⬡" },
+];
+
+export const LIGHTING_DEFAULTS = {
+  ch1_type: "RGB Light Strip",
+  ch1_qty: "4 Strips are connected",
+  ch2_type: "LL Fan Hub",
+  ch2_qty: "4 Fans are connected",
+};
+
+export const MACRO_KEYS = ["left", "right", "1", "2", "3", "4"];
+
+export const MACRO_LABELS = {
+  left: "Macro 1 — Clic gauche",
+  right: "Macro 2 — Clic droit",
+  1: "Macro 3 — Touche 1",
+  2: "Macro 4 — Touche 2",
+  3: "Macro 5 — Touche 3",
+  4: "Macro 6 — Touche 4",
+};

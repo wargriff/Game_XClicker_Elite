@@ -46,7 +46,7 @@ def bootstrap(progress: Optional[ProgressCallback] = None) -> BootContext:
     log("BOOT", "profil OK")
 
     _report(progress, 60, "Démarrage API Sidecar (port 17840)…")
-    sidecar = SidecarAPI(proxy)
+    sidecar = SidecarAPI(proxy, profiles=profiles)
     sidecar.start()
     log("BOOT", f"sidecar online={sidecar.online}")
 

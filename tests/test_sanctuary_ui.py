@@ -74,7 +74,8 @@ class TestHeaderTabs:
 class TestSidebarSections:
     @pytest.mark.parametrize("section", [
         "performance", "graphing", "lighting",
-        "channel1", "channel2", "macro1", "macro2",
+        "channel1", "channel2",
+        "macro1", "macro2", "macro3", "macro4", "macro5", "macro6",
     ])
     def test_sidebar_section(self, window, section):
         btn = window.sidebar._buttons[section]

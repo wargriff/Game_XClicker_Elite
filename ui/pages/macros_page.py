@@ -131,6 +131,10 @@ class MacrosPage(QWidget):
         mapping = {
             "macro1": "left",
             "macro2": "right",
+            "macro3": "1",
+            "macro4": "2",
+            "macro5": "3",
+            "macro6": "4",
             "channel1": "left",
             "channel2": "right",
             "keyboard": "1",

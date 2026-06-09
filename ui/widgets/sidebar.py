@@ -15,8 +15,12 @@ class Sidebar(QWidget):
         ("LIGHTING SETUP", "lighting"),
         ("LIGHTING CHANNEL 1", "channel1"),
         ("LIGHTING CHANNEL 2", "channel2"),
-        ("MACRO 1", "macro1"),
-        ("MACRO 2", "macro2"),
+        ("MACRO 1 — Clic gauche", "macro1"),
+        ("MACRO 2 — Clic droit", "macro2"),
+        ("MACRO 3 — Touche 1", "macro3"),
+        ("MACRO 4 — Touche 2", "macro4"),
+        ("MACRO 5 — Touche 3", "macro5"),
+        ("MACRO 6 — Touche 4", "macro6"),
     ]
 
     def __init__(self, profiles: list, parent=None):

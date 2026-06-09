@@ -1,27 +1,28 @@
 # -*- mode: python ; coding: utf-8 -*-
+# Build: scripts\BUILD_EXE.bat  →  dist\Game_XClicker_Elite.exe
 
 block_cipher = None
 
 a = Analysis(
-    ['Xmacro_main.py'],
+    ['launcher/desktop_main.py'],
     pathex=[],
     binaries=[],
     datas=[
         ('assets', 'assets'),
+        ('ui-web', 'ui-web'),
         ('profiles', 'profiles'),
-        ('web', 'web'),
         ('nodejs', 'nodejs'),
+        ('config', 'config'),
     ],
     hiddenimports=[
-        'PyQt6.QtCore',
-        'PyQt6.QtGui',
-        'PyQt6.QtWidgets',
         'psutil',
+        'webview',
+        'clr_loader',
     ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=['PyQt6'],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
@@ -50,5 +51,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='assets/favicon/favicon.svg',
+    icon='assets/brand/favicon.ico',
 )

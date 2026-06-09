@@ -242,7 +242,7 @@ class SanctuaryWindow(QMainWindow):
                     QTimer.singleShot(0, lambda: self.devices.focus_channel(1))
                 elif section == "channel2":
                     QTimer.singleShot(0, lambda: self.devices.focus_channel(2))
-            elif section in ("macro1", "macro2"):
+            elif section in ("macro1", "macro2", "macro3", "macro4", "macro5", "macro6"):
                 self.stack.setCurrentIndex(self.PAGE_MAP["macros"])
                 self.header._select_tab("macros", emit=False)
                 QTimer.singleShot(0, lambda s=section: self._focus_macro_section(s))
