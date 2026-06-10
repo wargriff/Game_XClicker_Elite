@@ -11,8 +11,24 @@ $Files = @(
     "OUVRE_MOI.py",
     "OUVRE_MOI.pyw",
     "GameXClicker.py",
-    "scripts/setup.py"
+    "scripts/__init__.py",
+    "scripts/setup.py",
+    "CORRIGER_LOCAL.ps1"
 )
+
+if (-not (Test-Path (Join-Path $Root "GameXClicker.py"))) {
+    Write-Host "ERREUR: lancez ce script DANS le dossier Game_XClicker_Elite" -ForegroundColor Red
+    Write-Host "Dossier actuel: $Root"
+    Read-Host "Entree"
+    exit 1
+}
+
+# Supprime launcher.py errone dans le dossier parent (cause ModuleNotFoundError)
+$WrongLauncher = Join-Path (Split-Path $Root -Parent) "launcher.py"
+if (Test-Path $WrongLauncher) {
+    Write-Host "Suppression launcher.py errone: $WrongLauncher" -ForegroundColor Yellow
+    Remove-Item $WrongLauncher -Force
+}
 
 Write-Host "Correction des lanceurs dans: $Root" -ForegroundColor Cyan
 

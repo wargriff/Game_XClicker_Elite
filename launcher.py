@@ -16,8 +16,30 @@ import subprocess
 import sys
 import traceback
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
 ENTRY = "GameXClicker.py"
+
+
+def find_project_root(start: str | None = None) -> str:
+    """Trouve le dossier qui contient GameXClicker.py."""
+    start = os.path.abspath(start or os.path.dirname(__file__))
+    candidates = [
+        start,
+        os.path.join(start, "Game_XClicker_Elite"),
+        os.path.dirname(start),
+        os.path.join(os.path.dirname(start), "Game_XClicker_Elite"),
+    ]
+    seen: set[str] = set()
+    for root in candidates:
+        root = os.path.abspath(root)
+        if root in seen:
+            continue
+        seen.add(root)
+        if os.path.isfile(os.path.join(root, ENTRY)):
+            return root
+    return start
+
+
+ROOT = find_project_root()
 
 
 def prepare(root: str | None = None) -> str:
@@ -48,25 +70,37 @@ def verify_installation(root: str | None = None) -> str | None:
     if os.path.isfile(os.path.join(root, ENTRY)):
         return None
     return (
-        "Fichiers du projet incomplets.\n\n"
-        "Ouvrez PowerShell dans ce dossier et lancez :\n"
-        "  python REPARER.py"
+        f"Dossier projet introuvable.\n\n"
+        f"Dossier actuel : {root}\n\n"
+        f"Ouvrez PowerShell dans Game_XClicker_Elite et lancez :\n"
+        f"  python REPARER.py"
     )
 
 
 def ensure_dependencies(*, quiet: bool = True) -> bool:
-    from scripts.setup import install_pip_deps, needs_pip_install
+    try:
+        import PyQt6.QtWidgets  # noqa: F401
 
-    if not needs_pip_install():
         return True
+    except ImportError:
+        pass
+
+    req = os.path.join(ROOT, "requirements.txt")
+    if not os.path.isfile(req):
+        return False
+
     print("[launcher] Installation des dépendances Python...")
-    return install_pip_deps(quiet=quiet)
+    flags = ["-q"] if quiet else []
+    return subprocess.call(
+        [sys.executable, "-m", "pip", "install", "-r", req, *flags],
+        cwd=ROOT,
+    ) == 0
 
 
 def run(argv: list[str] | None = None) -> int:
     """Prépare l'environnement puis ouvre Mission Control (ou mode CLI)."""
-    prepare()
-    err = verify_installation()
+    root = prepare()
+    err = verify_installation(root)
     if err:
         show_error(err)
         return 1
