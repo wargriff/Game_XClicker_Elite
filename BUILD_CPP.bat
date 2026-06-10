@@ -27,4 +27,8 @@ if errorlevel 1 (
 
 cmake --build cpp\build --config Release
 if errorlevel 1 pause
+echo.
+echo Binaires:
+echo   GameXClicker.exe    Win32 Control Panel
+echo   GameXClickerQt.exe  Qt Control Panel (si Qt6 installe)
 exit /b %ERRORLEVEL%

@@ -98,13 +98,14 @@ def ensure_dependencies(*, quiet: bool = True) -> bool:
 
 
 def run_cpp_native(root: str | None = None) -> int | None:
-    """Lance GameXClicker.exe (C++) si compile."""
+    """Lance GameXClickerQt.exe ou GameXClicker.exe (C++) si compile."""
     if sys.platform != "win32":
         return None
     root = root or ROOT
-    exe = os.path.join(root, "GameXClicker.exe")
-    if os.path.isfile(exe):
-        return subprocess.call([exe], cwd=root)
+    for name in ("GameXClickerQt.exe", "GameXClicker.exe"):
+        exe = os.path.join(root, name)
+        if os.path.isfile(exe):
+            return subprocess.call([exe], cwd=root)
     return None
 
 

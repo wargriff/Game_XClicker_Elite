@@ -1,6 +1,7 @@
 #include "control_panel.h"
 
-#include "core/engine.hpp"
+#include "app/bootstrap.hpp"
+#include "config/paths.hpp"
 #include "process_launcher.h"
 
 #include <commctrl.h>
@@ -88,7 +89,7 @@ void ControlPanel::OnCreate(HWND hwnd) {
     const int h = 40;
     const int x = 20;
 
-    HWND b0 = MakeButton(hwnd, L"DEMARRER MOTEUR MACROS (C++)", BTN_ENGINE, x, y, w, h);
+    HWND b0 = MakeButton(hwnd, L"DEMARRER MOTEUR + API :17840", BTN_ENGINE, x, y, w, h);
     y += h + 8;
     HWND b1 = MakeButton(hwnd, L"CONTROL PANEL (Python UI)", BTN_PANEL, x, y, w, h);
     y += h + 10;
@@ -119,9 +120,10 @@ void ControlPanel::SetStatus(const wchar_t* text) {
 }
 
 void ControlPanel::OnClose() {
-    if (engine_) {
-        engine_->stop();
-        engine_.reset();
+    if (boot_) {
+        boot_->sidecar->stop();
+        boot_->proxy->stop();
+        boot_.reset();
     }
 }
 
@@ -129,13 +131,15 @@ void ControlPanel::OnCommand(int id) {
     bool ok = false;
     switch (id) {
         case BTN_ENGINE:
-            if (!engine_) {
-                engine_ = std::make_unique<MacroManager>();
-                SetStatus(L"Moteur C++ actif (souris + clavier). XButton2 = toggle.");
+            if (!boot_) {
+                set_project_root(projectRoot_);
+                boot_ = std::make_unique<BootContext>(bootstrap(projectRoot_));
+                SetStatus(L"Moteur + API REST C++ actif -> http://127.0.0.1:17840");
             } else {
-                engine_->stop();
-                engine_.reset();
-                SetStatus(L"Moteur C++ arrete.");
+                boot_->sidecar->stop();
+                boot_->proxy->stop();
+                boot_.reset();
+                SetStatus(L"Moteur + API arretes.");
             }
             break;
         case BTN_PANEL:

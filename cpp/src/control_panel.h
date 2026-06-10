@@ -5,7 +5,7 @@
 #include <string>
 
 namespace gx {
-class MacroManager;
+class BootContext;
 }
 
 namespace gx {
@@ -26,7 +26,7 @@ private:
     HWND hwnd_ = nullptr;
     HWND status_ = nullptr;
     std::wstring projectRoot_;
-    std::unique_ptr<MacroManager> engine_;
+    std::unique_ptr<BootContext> boot_;
 };
 
 }  // namespace gx

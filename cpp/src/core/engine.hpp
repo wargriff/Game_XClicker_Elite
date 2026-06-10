@@ -27,6 +27,15 @@ public:
     int get_real_cps(const std::string& key) const;
     void stop();
     void toggle_global();
+    void set_active(const std::string& key, bool active);
+    bool is_active(const std::string& key) const;
+    void set_game_safe(bool state);
+    bool game_safe() const { return game_safe_; }
+
+    Btn* button(const std::string& key);
+    const Btn* button(const std::string& key) const;
+    bool enabled() const { return enabled_; }
+    const std::unordered_map<std::string, Btn>& buttons() const { return buttons_; }
 
 protected:
     std::atomic<bool> enabled_{true};

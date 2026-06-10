@@ -69,6 +69,28 @@ void BaseEngine::stop() { running_ = false; }
 
 void BaseEngine::toggle_global() { enabled_ = !enabled_; }
 
+void BaseEngine::set_active(const std::string& key, bool active) {
+    auto it = buttons_.find(key);
+    if (it != buttons_.end()) it->second.active = active;
+}
+
+bool BaseEngine::is_active(const std::string& key) const {
+    auto it = buttons_.find(key);
+    return it != buttons_.end() && it->second.active;
+}
+
+void BaseEngine::set_game_safe(bool state) { game_safe_ = state; }
+
+Btn* BaseEngine::button(const std::string& key) {
+    auto it = buttons_.find(key);
+    return it != buttons_.end() ? &it->second : nullptr;
+}
+
+const Btn* BaseEngine::button(const std::string& key) const {
+    auto it = buttons_.find(key);
+    return it != buttons_.end() ? &it->second : nullptr;
+}
+
 void BaseEngine::register_click(const std::string& key) {
     auto& s = stats_[key];
     const double now = now_sec();

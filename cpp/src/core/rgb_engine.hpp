@@ -27,6 +27,7 @@ public:
     void set_color(const std::string& zone, const RgbColor& color);
     RgbColor get_color(const std::string& zone) const;
     void trigger_reactive(const std::string& zone);
+    const std::unordered_map<std::string, RgbZone>& zones() const { return zones_; }
 
     double speed = 2.0;
 
