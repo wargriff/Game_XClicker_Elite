@@ -1,20 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="true" name="Centre de controle" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="true" name="Game XClicker — Mission Control" type="PythonConfigurationType" factoryName="Python">
     <module name="Game_XClicker_Elite" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-    <method v="2" />
-  </configuration>
-  <configuration name="Native direct" type="PythonConfigurationType" factoryName="Python">
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-    <option name="PARAMETERS" value="--native" />
-    <method v="2" />
-  </configuration>
-  <configuration name="Web direct" type="PythonConfigurationType" factoryName="Python">
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-    <option name="PARAMETERS" value="--web" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/GameXClicker.py" />
     <method v="2" />
   </configuration>
 </component>

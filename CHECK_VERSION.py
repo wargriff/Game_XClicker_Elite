@@ -1,4 +1,4 @@
-"""Verification START.bat + gxclicker.py."""
+"""Verification Game XClicker Elite."""
 
 import os
 import sys
@@ -8,29 +8,16 @@ sys.path.insert(0, ROOT)
 
 FILES = [
     "START.bat",
-    "LAUNCH_NATIVE.bat",
-    "LAUNCH_WEB.bat",
+    "GameXClicker.py",
+    "ui/mission_control.py",
     "BUILD.bat",
-    "LAUNCH_EXE.bat",
     "REPARER.bat",
-    "main.py",
     "native_app.py",
-    "ui/control_center.py",
-    "scripts/build_exe.py",
     "gxclicker.py",
     "build.spec",
     "config/asset_system.py",
     "ui-web/index.html",
-    "assets/brand/favicon.ico",
     "services/bootstrap.py",
-    "services/sidecar_api.py",
-]
-
-DEAD = [
-    "run.py",
-    "launch.py",
-    "FIX_START.bat",
-    "launchers/START.bat",
 ]
 
 
@@ -44,19 +31,14 @@ def main() -> int:
         else:
             print(f"[FAIL] {f}")
             ok = False
-    for f in DEAD:
-        if os.path.isfile(os.path.join(ROOT, f.replace("/", os.sep))):
-            print(f"[WARN] obsolete — supprimez: {f}")
-    if os.path.isfile(os.path.join(ROOT, "ui.py")):
-        print("[WARN] ui.py present — START.bat le renomme")
     print()
-    if not ok:
-        print("INCOMPLET — double-cliquez REPARER.bat")
-        print("  ou: git pull origin main")
+    if ok:
+        print("PRET — un seul programme:")
+        print("  GameXClicker.py  ou  START.bat  → Mission Control")
+        print("  PyCharm: import pycharm/Game_XClicker_Elite.run.xml")
+        print("  Build .exe → copie auto sur le Bureau")
     else:
-        print("PRET — un seul lanceur:")
-        print("  START.bat  ou  main.py  → Centre de controle (tout en 1)")
-        print("  PyCharm: Run main.py")
+        print("INCOMPLET — REPARER.bat")
     return 0 if ok else 1
 
 

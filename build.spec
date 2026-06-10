@@ -11,12 +11,12 @@ hidden = [
     'services.profile_manager', 'services.node_bridge', 'services.device_scanner',
     'services.api_monitor',
     'core.engine', 'core.models', 'core.win32_input',
-    'ui.control_center', 'ui.sanctuary_window', 'ui.splash_screen', 'ui.pages.home_page',
+    'ui.control_center', 'ui.mission_control', 'ui.sanctuary_window', 'ui.splash_screen', 'ui.pages.home_page',
     'rgb_engine',
 ]
 
 a = Analysis(
-    ['main.py'],
+    ['GameXClicker.py'],
     pathex=[],
     binaries=[],
     datas=[
