@@ -1,10 +1,9 @@
 # Telecharge les fichiers essentiels depuis GitHub (sans git)
-# Executez dans Game_XClicker_Elite :
-#   powershell -ExecutionPolicy Bypass -File TELECHARGER_MANQUANT.ps1
+# powershell -ExecutionPolicy Bypass -File TELECHARGER_MANQUANT.ps1
 
 $ErrorActionPreference = "Stop"
 $Root = $PSScriptRoot
-if (-not $Root) { $Root = Get-Location }
+if (-not $Root) { $Root = (Get-Location).Path }
 Set-Location $Root
 
 $Base = "https://raw.githubusercontent.com/wargriff/Game_XClicker_Elite/main"
@@ -22,7 +21,11 @@ $Files = @(
     "ui/control_panel.py",
     "ui/mission_control.py",
     "ui/sanctuary_window.py",
-    "config/runtime.py"
+    "ui/widgets/mural_panel.py",
+    "ui/tabs/rgb_tab.py",
+    "ui/pages/devices_page.py",
+    "config/runtime.py",
+    "services/profile_manager.py"
 )
 
 Write-Host "Telechargement dans: $Root" -ForegroundColor Cyan
@@ -30,7 +33,9 @@ foreach ($f in $Files) {
     $url = "$Base/$f"
     $dest = Join-Path $Root ($f -replace "/", "\")
     $dir = Split-Path $dest -Parent
-    if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    if (-not (Test-Path $dir)) {
+        New-Item -ItemType Directory -Path $dir -Force | Out-Null
+    }
     Write-Host "  $f"
     Invoke-WebRequest -Uri $url -OutFile $dest -UseBasicParsing
 }
@@ -41,7 +46,8 @@ if (-not (Test-Path $VenvPy)) {
     $VenvPy = Join-Path $Root ".venv\Scripts\python.exe"
 }
 if (-not (Test-Path $VenvPy)) {
-    Write-Host "Python venv absent — creez-le: py -3.12 -m venv $Parent\.venv" -ForegroundColor Yellow
+    Write-Host "Python venv absent. Creez-le:" -ForegroundColor Yellow
+    Write-Host "  py -3.12 -m venv $Parent\.venv"
 } else {
     & $VenvPy -m pip install -r requirements.txt -q
     Write-Host "Lancement..." -ForegroundColor Green
