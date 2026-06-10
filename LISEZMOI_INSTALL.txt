@@ -1,0 +1,28 @@
+GAME XCLICKER ELITE - INSTALLATION VISUAL STUDIO
+=================================================
+
+VOTRE DOSSIER ACTUEL N'A PAS GIT (.git absent).
+NE PAS utiliser: git pull, git fetch, git reset
+
+METHODE 1 - CLONE PROPRE (recommande)
+-------------------------------------
+1. Fermez PyCharm et Visual Studio
+2. PowerShell:
+
+   cd C:\Users\wargriff\visual_studio_project
+   git clone https://github.com/wargriff/Game_XClicker_Elite.git Game_XClicker_Elite_NEW
+
+3. Attendez la fin du telechargement (plusieurs minutes)
+4. Double-clic: Game_XClicker_Elite_NEW\APRES_CLONE.bat
+
+5. Si OK, renommez:
+   Game_XClicker_Elite      -> Game_XClicker_Elite_OLD
+   Game_XClicker_Elite_NEW  -> Game_XClicker_Elite
+
+METHODE 2 - FIX RAPIDE (dossier actuel)
+---------------------------------------
+Double-clic: FIX_RGB.bat
+
+LANCEMENT QUOTIDIEN
+-------------------
+Double-clic: OUVRE_MOI.pyw
