@@ -15,6 +15,8 @@ FILES = [
     "ui/control_panel.py",
     "REPARER.py",
     "native_app.py",
+    "rgb_engine.py",
+    "core/rgb_engine.py",
     "gxclicker.py",
     "build.spec",
     "config/asset_system.py",

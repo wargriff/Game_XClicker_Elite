@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
-from rgb_engine import RGBEngine
+from core.rgb_engine import RGBEngine
 from ui.styles.icue_theme import ICUE
 from ui.widgets.device_center_view import DeviceCenterView
 from ui.widgets.device_strip import DeviceStrip

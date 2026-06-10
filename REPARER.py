@@ -23,7 +23,10 @@ from scripts.setup import install_node_deps, install_pip_deps, unblock_windows
 
 REQUIRED = (
     "GameXClicker.py",
+    "launcher.py",
     "gxclicker.py",
+    "rgb_engine.py",
+    "core/rgb_engine.py",
     "services/bootstrap.py",
     "ui-web/index.html",
 )

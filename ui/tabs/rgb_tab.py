@@ -1,7 +1,7 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QComboBox, QGridLayout, QLabel, QVBoxLayout, QWidget
 
-from rgb_engine import RGBEngine
+from core.rgb_engine import RGBEngine
 
 
 ZONE_LABELS = {

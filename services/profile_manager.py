@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from core.engine import MacroManager
 
 if TYPE_CHECKING:
-    from rgb_engine import RGBEngine
+    from core.rgb_engine import RGBEngine
 
 
 class ProfileManager:

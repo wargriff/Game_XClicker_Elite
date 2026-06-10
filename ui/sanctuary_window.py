@@ -1,5 +1,12 @@
 import os
+import sys
 import webbrowser
+
+from config.runtime import project_root
+
+_root = project_root()
+if _root not in sys.path:
+    sys.path.insert(0, _root)
 
 import utils.legacy_patch  # noqa: F401
 
@@ -15,7 +22,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
-from rgb_engine import RGBEngine
+from core.rgb_engine import RGBEngine
 from services.bootstrap import BootContext
 from services.node_bridge import NodeBridge
 from services.profile_manager import ProfileManager

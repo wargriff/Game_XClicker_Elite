@@ -30,10 +30,24 @@ if (Test-Path (Join-Path $Project ".git")) {
 } elseif (Test-Path $Project) {
     Write-Host "[1/5] Dossier sans git — sauvegarde + clone propre..." -ForegroundColor Yellow
     $Backup = Join-Path $Parent ("Game_XClicker_Elite_backup_" + (Get-Date -Format "yyyyMMdd_HHmmss"))
-    Rename-Item $Project $Backup
-    Write-Host "      Ancien dossier -> $Backup"
-    git clone $Repo $Project
-    Set-Location $Project
+    try {
+        Rename-Item $Project $Backup -ErrorAction Stop
+        Write-Host "      Ancien dossier -> $Backup"
+        git clone $Repo $Project
+        Set-Location $Project
+    } catch {
+        Write-Host "      Dossier en cours d'utilisation — clone vers Game_XClicker_Elite_NEW" -ForegroundColor Yellow
+        $NewProject = Join-Path $Parent "Game_XClicker_Elite_NEW"
+        if (Test-Path $NewProject) { Remove-Item $NewProject -Recurse -Force }
+        git clone $Repo $NewProject
+        Set-Location $NewProject
+        $Project = $NewProject
+        Write-Host ""
+        Write-Host "  Fermez PyCharm/VS, puis renommez:" -ForegroundColor Green
+        Write-Host "    Game_XClicker_Elite     -> Game_XClicker_Elite_OLD"
+        Write-Host "    Game_XClicker_Elite_NEW -> Game_XClicker_Elite"
+        Write-Host ""
+    }
 } else {
     Write-Host "[1/5] git clone..." -ForegroundColor Yellow
     git clone $Repo $Project
