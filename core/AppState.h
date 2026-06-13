@@ -5,7 +5,7 @@
 
 struct AppState
 {
-    NavSection currentSection = NavSection::DeviceCenter;
+    NavSection currentSection = NavSection::ProfileManager;
     DeviceTab deviceTab = DeviceTab::Keyboard;
     int selectedDeviceIndex = 2;
     int activeProfileIndex = 0;

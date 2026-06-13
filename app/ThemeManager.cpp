@@ -1,21 +1,24 @@
 #include "ThemeManager.h"
+#include "../core/AppPaths.h"
 #include <QApplication>
-#include <QFile>
 #include <QDir>
+#include <QFile>
 
 ThemeManager::ThemeManager(QObject* parent) : QObject(parent) {}
 
 QString ThemeManager::readStyleSheet(const QString& fileName) const
 {
-    QFile f(QStringLiteral(":/styles/") + fileName);
-    if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        const QString disk = QDir(QApplication::applicationDirPath()).filePath(QStringLiteral("../styles/") + fileName);
-        f.setFileName(disk);
-        if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
-            return {};
-    }
-    return QString::fromUtf8(f.readAll());
+    const QString qrcPath = QStringLiteral(":/styles/") + fileName;
+    QFile f(qrcPath);
+    if (f.open(QIODevice::ReadOnly | QIODevice::Text))
+        return QString::fromUtf8(f.readAll());
+
+    const QString disk = QDir(AppPaths::stylesRoot()).filePath(fileName);
+    f.setFileName(disk);
+    if (f.open(QIODevice::ReadOnly | QIODevice::Text))
+        return QString::fromUtf8(f.readAll());
+
+    return {};
 }
 
 void ThemeManager::loadTheme(const QString& themeName)

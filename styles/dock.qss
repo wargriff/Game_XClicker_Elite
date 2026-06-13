@@ -1,25 +1,31 @@
-QWidget#deviceDock {
-    background-color: #08080c;
-    border-top: 1px solid #1c1c26;
+QFrame#floatingDock {
+    background-color: rgba(12, 10, 14, 220);
+    border-radius: 14px;
+    margin: 0 18px 12px 18px;
+}
+
+QWidget#deviceDock, QWidget#deviceDockPremium {
+    background: transparent;
+    border: none;
     min-height: 88px;
 }
 
 QFrame#dockItem {
-    background-color: #16161e;
-    border: 1px solid #2a3040;
+    background-color: rgba(22, 18, 24, 230);
+    border: 1px solid rgba(80, 40, 48, 140);
     border-radius: 12px;
     min-width: 68px;
     min-height: 68px;
 }
 
 QFrame#dockItem:hover {
-    border-color: #3498db;
-    background-color: #141820;
+    border-color: rgba(224, 38, 38, 180);
+    background-color: rgba(32, 18, 22, 240);
 }
 
 QFrame#dockItem[selected="true"] {
-    border: 2px solid #3498db;
-    background-color: #101820;
+    border: 2px solid #e02626;
+    background-color: rgba(28, 14, 18, 250);
 }
 
 QLabel#dockIcon {

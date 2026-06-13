@@ -57,9 +57,13 @@ LightingPage::LightingPage(QWidget* parent) : QWidget(parent)
     root->setContentsMargins(24, 16, 24, 16);
     root->setSpacing(16);
 
-    auto* title = new QLabel(QStringLiteral("Lighting Engine"), this);
-    title->setObjectName(QStringLiteral("pageTitle"));
-    root->addWidget(title);
+    auto* banner = new QLabel(this);
+    banner->setObjectName(QStringLiteral("pageBanner"));
+    banner->setPixmap(AssetGenerator::instance().pixmap(
+        QStringLiteral("assets/banners/banner-lighting.svg"), QSize(900, 120)));
+    banner->setScaledContents(true);
+    banner->setFixedHeight(120);
+    root->addWidget(banner);
 
     auto* subtitle = new QLabel(
         QStringLiteral("Controlez l'eclairage RGB de tous vos peripheriques — effets, couleurs et synchronisation."),

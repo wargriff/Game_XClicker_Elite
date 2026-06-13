@@ -1,6 +1,7 @@
 #include "MacroLibraryPage.h"
 
 #include "../../core/AppState.h"
+#include "../../core/AssetGenerator.h"
 #include "../../core/EventBus.h"
 #include "../../models/MacroModel.h"
 #include "../../services/MacroService.h"
@@ -87,17 +88,20 @@ MacroLibraryPage::MacroLibraryPage(QWidget* parent) : QWidget(parent)
     root->setContentsMargins(24, 16, 24, 16);
     root->setSpacing(16);
 
-    auto* titleRow = new QHBoxLayout();
-    auto* title = new QLabel(QStringLiteral("Macro Library"), this);
-    title->setObjectName(QStringLiteral("pageTitle"));
-    titleRow->addWidget(title);
-    titleRow->addStretch();
+    auto* bannerRow = new QHBoxLayout();
+    auto* banner = new QLabel(this);
+    banner->setObjectName(QStringLiteral("pageBanner"));
+    banner->setPixmap(AssetGenerator::instance().pixmap(
+        QStringLiteral("assets/banners/banner-macros.svg"), QSize(900, 120)));
+    banner->setScaledContents(true);
+    banner->setFixedHeight(120);
+    bannerRow->addWidget(banner, 1);
 
-    auto* addBtn = new QPushButton(QStringLiteral("+ Ajouter une macro"), this);
+    auto* addBtn = new QPushButton(QStringLiteral("+ Ajouter"), this);
     addBtn->setObjectName(QStringLiteral("primaryButton"));
     connect(addBtn, &QPushButton::clicked, this, &MacroLibraryPage::onAddMacro);
-    titleRow->addWidget(addBtn);
-    root->addLayout(titleRow);
+    bannerRow->addWidget(addBtn, 0, Qt::AlignTop);
+    root->addLayout(bannerRow);
 
     auto* subtitle = new QLabel(
         QStringLiteral("Cliquez une cellule pour modifier. Les changements sont enregistres automatiquement."),

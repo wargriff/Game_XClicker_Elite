@@ -45,36 +45,36 @@ inline QString navSectionLabel(NavSection s)
 {
     switch (s)
     {
-    case NavSection::MissionControl:  return QStringLiteral("Mission Control");
-    case NavSection::SettingsHub:     return QStringLiteral("Mission Control");
-    case NavSection::DeviceCenter:    return QStringLiteral("Device Center");
-    case NavSection::MacroStudio:     return QStringLiteral("Macro Studio");
-    case NavSection::MacroLibrary:    return QStringLiteral("Macro Library");
-    case NavSection::ProfileManager:  return QStringLiteral("Profile Manager");
-    case NavSection::ActivityMonitor: return QStringLiteral("Activity Monitor");
-    case NavSection::AnalyticsCenter: return QStringLiteral("Analytics Center");
-    case NavSection::MobileCommand:   return QStringLiteral("Mobile Command");
-    case NavSection::LightingEngine:  return QStringLiteral("Lighting Engine");
+    case NavSection::ProfileManager:  return QStringLiteral("Profils");
+    case NavSection::DeviceCenter:    return QStringLiteral("Peripheriques");
+    case NavSection::MacroLibrary:    return QStringLiteral("Macros");
+    case NavSection::LightingEngine:  return QStringLiteral("Eclairage");
+    case NavSection::MissionControl:
+    case NavSection::SettingsHub:
+    case NavSection::ActivityMonitor: return QStringLiteral("Peripheriques");
+    case NavSection::MacroStudio:     return QStringLiteral("Macros");
+    case NavSection::AnalyticsCenter:
+    case NavSection::MobileCommand:     return QStringLiteral("Peripheriques");
     }
-    return {};
+    return QStringLiteral("Peripheriques");
 }
 
 inline QString navSectionIconAsset(NavSection s)
 {
     switch (s)
     {
+    case NavSection::ProfileManager:  return QStringLiteral("icons/nav-profiles.svg");
+    case NavSection::DeviceCenter:    return QStringLiteral("icons/nav-devices.svg");
+    case NavSection::MacroLibrary:
+    case NavSection::MacroStudio:     return QStringLiteral("icons/nav-macros.svg");
+    case NavSection::LightingEngine:  return QStringLiteral("icons/nav-lighting.svg");
     case NavSection::MissionControl:
-    case NavSection::SettingsHub:     return QStringLiteral("icons/mission-control.svg");
-    case NavSection::DeviceCenter:    return QStringLiteral("icons/device-center.svg");
-    case NavSection::MacroStudio:     return QStringLiteral("icons/macro-studio.svg");
-    case NavSection::MacroLibrary:    return QStringLiteral("icons/macro-library.svg");
-    case NavSection::ProfileManager:  return QStringLiteral("icons/profile-manager.svg");
-    case NavSection::ActivityMonitor: return QStringLiteral("icons/activity-monitor.svg");
-    case NavSection::AnalyticsCenter: return QStringLiteral("icons/analytics-center.svg");
-    case NavSection::MobileCommand:   return QStringLiteral("icons/mobile-command.svg");
-    case NavSection::LightingEngine:  return QStringLiteral("icons/lighting-engine.svg");
+    case NavSection::SettingsHub:
+    case NavSection::ActivityMonitor:
+    case NavSection::AnalyticsCenter:
+    case NavSection::MobileCommand:   return QStringLiteral("icons/nav-devices.svg");
     }
-    return QStringLiteral("icons/settings-hub.svg");
+    return QStringLiteral("icons/nav-devices.svg");
 }
 
 inline QString deviceIconAsset(const QString& deviceId)

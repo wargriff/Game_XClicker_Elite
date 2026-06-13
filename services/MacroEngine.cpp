@@ -5,9 +5,9 @@
 #include "../core/Logger.h"
 #include "../models/MacroModel.h"
 
-#include <QAbstractNativeEventFilter>
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QMetaObject>
 
 #ifdef Q_OS_WIN
 #ifndef NOMINMAX
@@ -16,31 +16,36 @@
 #include <windows.h>
 #endif
 
+#ifdef Q_OS_WIN
 namespace
 {
-#ifdef Q_OS_WIN
-class MacroNativeFilter : public QAbstractNativeEventFilter
+HHOOK g_mouseHook = nullptr;
+
+LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-public:
-    bool nativeEventFilter(const QByteArray& eventType, void* message, qintptr*) override
+    if (nCode >= 0 && wParam == WM_XBUTTONDOWN)
     {
-        if (eventType != "windows_generic_MSG" && eventType != "windows_dispatcher_MSG")
-            return false;
-
-        const MSG* msg = static_cast<MSG*>(message);
-        if (msg->message != WM_XBUTTONDOWN)
-            return false;
-
-        const WORD xbtn = GET_XBUTTON_WPARAM(msg->wParam);
+        const auto* info = reinterpret_cast<MSLLHOOKSTRUCT*>(lParam);
+        const WORD xbtn = HIWORD(info->mouseData);
+        int btnIndex = 0;
         if (xbtn == XBUTTON1)
-            MacroEngine::instance().onMouseSideButton(1);
+            btnIndex = 1;
         else if (xbtn == XBUTTON2)
-            MacroEngine::instance().onMouseSideButton(2);
-        return false;
+            btnIndex = 2;
+
+        if (btnIndex != 0)
+        {
+            QMetaObject::invokeMethod(
+                &MacroEngine::instance(),
+                "handleSideButton",
+                Qt::QueuedConnection,
+                Q_ARG(int, btnIndex));
+        }
     }
-};
-#endif
+    return CallNextHookEx(g_mouseHook, nCode, wParam, lParam);
 }
+}
+#endif
 
 MacroEngine& MacroEngine::instance()
 {
@@ -50,9 +55,33 @@ MacroEngine& MacroEngine::instance()
 
 MacroEngine::MacroEngine(QObject* parent) : QObject(parent)
 {
-    m_timer.setInterval(8);
+    m_timer.setInterval(16);
     connect(&m_timer, &QTimer::timeout, this, &MacroEngine::onTick);
     connect(&EventBus::instance(), &EventBus::macroMasterChanged, this, &MacroEngine::onMasterChanged);
+}
+
+void MacroEngine::installGlobalMouseHook()
+{
+#ifdef Q_OS_WIN
+    if (g_mouseHook)
+        return;
+    g_mouseHook = SetWindowsHookExW(WH_MOUSE_LL, LowLevelMouseProc, GetModuleHandleW(nullptr), 0);
+    if (g_mouseHook)
+        Logger::info(QStringLiteral("Hook souris global actif (L1/L2 partout, meme en jeu)"));
+    else
+        Logger::info(QStringLiteral("Echec hook souris global — erreur %1").arg(GetLastError()));
+#endif
+}
+
+void MacroEngine::removeGlobalMouseHook()
+{
+#ifdef Q_OS_WIN
+    if (g_mouseHook)
+    {
+        UnhookWindowsHookEx(g_mouseHook);
+        g_mouseHook = nullptr;
+    }
+#endif
 }
 
 void MacroEngine::start()
@@ -60,35 +89,63 @@ void MacroEngine::start()
     if (m_running)
         return;
 
-#ifdef Q_OS_WIN
-    if (!m_nativeFilter)
-    {
-        m_nativeFilter = new MacroNativeFilter();
-        QCoreApplication::instance()->installNativeEventFilter(m_nativeFilter);
-    }
-#endif
-
+    installGlobalMouseHook();
     m_timer.start();
     m_running = true;
-    Logger::info(QStringLiteral("MacroEngine actif — L1 = XButton1 (bouton lateral souris)"));
+    Logger::info(QStringLiteral("MacroEngine actif — L2 bascule ON/OFF, autoclicks touches 1-2-3-4"));
 }
 
 void MacroEngine::stop()
 {
     m_timer.stop();
+    removeGlobalMouseHook();
+    if (!m_running)
+        return;
     m_running = false;
+    m_lastFireMs.clear();
+}
+
+void MacroEngine::handleSideButton(int buttonIndex)
+{
+    onMouseSideButton(buttonIndex);
 }
 
 void MacroEngine::onMasterChanged(bool enabled)
 {
-    Logger::info(enabled ? QStringLiteral("Macros L1 : ON")
-                         : QStringLiteral("Macros L1 : OFF"));
+    Logger::info(enabled ? QStringLiteral("Macros : ON")
+                         : QStringLiteral("Macros : OFF"));
 }
 
-void MacroEngine::onMouseSideButton(int buttonIndex)
+void MacroEngine::toggleMaster()
 {
-    const QString sideLabel = buttonIndex == 1 ? QStringLiteral("L1") : QStringLiteral("L2");
+    setMasterEnabled(!AppStateStore::instance().state().macroMasterEnabled);
+}
+
+void MacroEngine::setMasterEnabled(bool enabled)
+{
+    auto& st = AppStateStore::instance().state();
+    if (st.macroMasterEnabled == enabled)
+        return;
+
+    st.macroMasterEnabled = enabled;
+
     auto& macros = MacroService::instance().activeMacros();
+    for (auto& macro : macros)
+    {
+        if (macro.toggle && macro.device == QStringLiteral("mouse") &&
+            (macro.keyLabel == QStringLiteral("L2") || macro.keyLabel == QStringLiteral("L1")))
+        {
+            macro.active = true;
+        }
+    }
+
+    emit EventBus::instance().macroMasterChanged(enabled);
+    emit masterToggled(enabled);
+}
+
+bool MacroEngine::handleSideLabel(const QString& sideLabel)
+{
+    const auto& macros = MacroService::instance().activeMacros();
 
     for (const MacroEntry& entry : macros)
     {
@@ -96,24 +153,36 @@ void MacroEngine::onMouseSideButton(int buttonIndex)
             continue;
         if (entry.keyLabel.compare(sideLabel, Qt::CaseInsensitive) != 0)
             continue;
-        if (!entry.active)
-            return;
 
         if (entry.toggle)
         {
-            auto& st = AppStateStore::instance().state();
-            st.macroMasterEnabled = !st.macroMasterEnabled;
-            emit EventBus::instance().macroMasterChanged(st.macroMasterEnabled);
-            emit masterToggled(st.macroMasterEnabled);
-            Logger::info(QStringLiteral("L1 bascule macros : %1")
-                             .arg(st.macroMasterEnabled ? QStringLiteral("ON") : QStringLiteral("OFF")));
-            return;
+            toggleMaster();
+            Logger::info(QStringLiteral("Bouton %1 — macros %2")
+                             .arg(sideLabel,
+                                  AppStateStore::instance().state().macroMasterEnabled
+                                      ? QStringLiteral("ON")
+                                      : QStringLiteral("OFF")));
+            return true;
         }
+
+        if (!entry.active)
+            continue;
 
         simulateKeyLabel(entry.keyLabel);
         emit macroTriggered(entry.keyLabel);
-        return;
+        return true;
     }
+    return false;
+}
+
+void MacroEngine::onMouseSideButton(int buttonIndex)
+{
+    const QString primary = buttonIndex == 1 ? QStringLiteral("L1") : QStringLiteral("L2");
+    const QString fallback = buttonIndex == 1 ? QStringLiteral("L2") : QStringLiteral("L1");
+
+    if (handleSideLabel(primary))
+        return;
+    handleSideLabel(fallback);
 }
 
 quint16 MacroEngine::virtualKeyForLabel(const QString& label) const
@@ -122,9 +191,7 @@ quint16 MacroEngine::virtualKeyForLabel(const QString& label) const
     if (k.size() == 1)
     {
         const QChar c = k.at(0).toUpper();
-        if (c.isDigit())
-            return static_cast<quint16>(c.unicode());
-        if (c.isLetter())
+        if (c.isDigit() || c.isLetter())
             return static_cast<quint16>(c.unicode());
     }
 
@@ -152,14 +219,19 @@ void MacroEngine::simulateKeyLabel(const QString& label)
     if (!vk)
         return;
 
+    const UINT scan = MapVirtualKeyW(vk, MAPVK_VK_TO_VSC);
+    if (!scan)
+        return;
+
     INPUT down {};
     down.type = INPUT_KEYBOARD;
-    down.ki.wVk = vk;
+    down.ki.wScan = static_cast<WORD>(scan);
+    down.ki.dwFlags = KEYEVENTF_SCANCODE;
 
     INPUT up {};
     up.type = INPUT_KEYBOARD;
-    up.ki.wVk = vk;
-    up.ki.dwFlags = KEYEVENTF_KEYUP;
+    up.ki.wScan = static_cast<WORD>(scan);
+    up.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
 
     INPUT seq[2] = { down, up };
     SendInput(2, seq, sizeof(INPUT));
@@ -174,12 +246,14 @@ bool MacroEngine::shouldRunMacro(const MacroEntry& entry) const
         return false;
     if (entry.gatedByMaster)
         return AppStateStore::instance().state().macroMasterEnabled;
-    return false;
+    return true;
 }
 
 void MacroEngine::onTick()
 {
     if (!AppStateStore::instance().state().engineActive)
+        return;
+    if (!AppStateStore::instance().state().macroMasterEnabled)
         return;
 
     const qint64 now = QDateTime::currentMSecsSinceEpoch();

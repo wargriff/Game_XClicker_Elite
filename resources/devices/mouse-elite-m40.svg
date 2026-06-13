@@ -1,119 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 580">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 480">
   <defs>
-    <linearGradient id="bodyMain" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#4a4a58"/>
-      <stop offset="18%" stop-color="#32323e"/>
-      <stop offset="55%" stop-color="#22222c"/>
-      <stop offset="100%" stop-color="#12121a"/>
-    </linearGradient>
-    <linearGradient id="btnLeft" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#3e3e4c"/>
-      <stop offset="100%" stop-color="#252530"/>
-    </linearGradient>
-    <linearGradient id="btnRight" x1="1" y1="0" x2="0" y2="1">
+    <linearGradient id="shell" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#3a3a48"/>
-      <stop offset="100%" stop-color="#23232e"/>
+      <stop offset="55%" stop-color="#1a1a22"/>
+      <stop offset="100%" stop-color="#0c0c12"/>
     </linearGradient>
-    <linearGradient id="sideBtn" x1="0" y1="0.5" x2="1" y2="0.5">
-      <stop offset="0%" stop-color="#2a2218"/>
-      <stop offset="100%" stop-color="#4a3828"/>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3498db"/>
+      <stop offset="100%" stop-color="#2980b9"/>
     </linearGradient>
-    <linearGradient id="wheelGrad" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#555568"/>
-      <stop offset="50%" stop-color="#2a2a36"/>
-      <stop offset="100%" stop-color="#555568"/>
-    </linearGradient>
-    <linearGradient id="rgbStrip" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#e02626"/>
-      <stop offset="35%" stop-color="#3498db"/>
-      <stop offset="70%" stop-color="#9b59b6"/>
-      <stop offset="100%" stop-color="#e02626"/>
-    </linearGradient>
-    <linearGradient id="specular" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-    </linearGradient>
-    <filter id="dropShadow" x="-20%" y="-10%" width="140%" height="130%">
-      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity="0.55"/>
-    </filter>
-    <filter id="btnGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="3" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <pattern id="gripDots" width="8" height="8" patternUnits="userSpaceOnUse">
-      <circle cx="4" cy="4" r="1.1" fill="#ffffff" opacity="0.06"/>
-    </pattern>
   </defs>
-
-  <!-- Ombre au sol -->
-  <ellipse cx="210" cy="548" rx="118" ry="22" fill="#000" opacity="0.45"/>
-
-  <!-- Coque principale -->
-  <path id="shell-body"
-        d="M210 28 C318 28 378 88 378 198 L378 368 C378 468 318 528 210 538 C102 528 42 468 42 368 L42 198 C42 88 102 28 210 28 Z"
-        fill="url(#bodyMain)" stroke="#2a2a34" stroke-width="2" filter="url(#dropShadow)"/>
-
-  <!-- Zone palm / grip -->
-  <path d="M210 280 C290 280 340 330 340 400 C340 460 290 500 210 508 C130 500 80 460 80 400 C80 330 130 280 210 280 Z"
-        fill="url(#gripDots)" opacity="0.9"/>
-  <path d="M210 290 C275 290 318 332 318 395 C318 448 275 485 210 492 C145 485 102 448 102 395 C102 332 145 290 210 290 Z"
-        fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.06"/>
-
-  <!-- Bouton GAUCHE (panneau distinct) -->
-  <path id="zone-left"
-        d="M72 62 C118 48 198 44 205 44 L208 118 C208 198 198 248 168 268 L98 252 C72 220 68 140 72 62 Z"
-        fill="url(#btnLeft)" stroke="#3498db" stroke-width="2.2"/>
-  <path d="M88 78 L188 72" stroke="#ffffff" stroke-width="1" opacity="0.12"/>
-  <text x="138" y="168" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#6ec3ff" opacity="0.85">GAUCHE</text>
-
-  <!-- Bouton DROIT -->
-  <path id="zone-right"
-        d="M348 62 C302 48 222 44 215 44 L212 118 C212 198 222 248 252 268 L322 252 C348 220 352 140 348 62 Z"
-        fill="url(#btnRight)" stroke="#3498db" stroke-width="2.2"/>
-  <path d="M332 78 L232 72" stroke="#ffffff" stroke-width="1" opacity="0.12"/>
-  <text x="282" y="168" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="15" font-weight="700" fill="#6ec3ff" opacity="0.85">DROIT</text>
-
-  <!-- Rainure centrale + molette -->
-  <path d="M205 44 L215 44 L218 250 L202 250 Z" fill="#0e0e14" opacity="0.65"/>
-
-  <rect id="zone-wheel" x="188" y="118" width="44" height="92" rx="14"
-        fill="#0a0a10" stroke="#60b4ff" stroke-width="2"/>
-  <rect x="194" y="128" width="32" height="18" rx="6" fill="url(#wheelGrad)"/>
-  <rect x="194" y="152" width="32" height="18" rx="6" fill="url(#wheelGrad)" opacity="0.85"/>
-  <rect x="194" y="176" width="32" height="18" rx="6" fill="url(#wheelGrad)" opacity="0.7"/>
-  <ellipse cx="210" cy="178" rx="10" ry="38" fill="none" stroke="#3498db" stroke-width="1.2" opacity="0.45"/>
-  <text x="210" y="228" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="11" font-weight="600" fill="#90c8ff">MOlette</text>
-
-  <!-- Bouton DPI (sous la molette) -->
-  <ellipse id="zone-dpi" cx="210" cy="268" rx="34" ry="22"
-           fill="#181820" stroke="#60b4ff" stroke-width="1.6" stroke-dasharray="3 2"/>
-  <text x="210" y="273" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="10" font-weight="700" fill="#80b8e8">DPI</text>
-
-  <!-- L1 / L2 — boutons latéraux thumb (côté gauche) -->
-  <path id="zone-l1"
-        d="M34 208 L34 248 C34 258 42 264 52 264 L78 258 C88 252 88 238 82 224 L68 202 C58 194 42 196 34 208 Z"
-        fill="url(#sideBtn)" stroke="#ff8c2a" stroke-width="2.6" filter="url(#btnGlow)"/>
-  <text x="58" y="238" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="800" fill="#ffb066">L1</text>
-
-  <path id="zone-l2"
-        d="M34 278 L34 318 C34 328 42 334 52 334 L78 328 C88 322 88 308 82 294 L68 272 C58 264 42 266 34 278 Z"
-        fill="url(#sideBtn)" stroke="#ff8c2a" stroke-width="2" opacity="0.92"/>
-  <text x="58" y="308" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="800" fill="#ffb066" opacity="0.8">L2</text>
-
-  <!-- Grip thumb côté droit -->
-  <path d="M386 248 C392 268 392 298 386 318 L378 308 C382 288 382 268 378 252 Z"
-        fill="#1a1a22" stroke="#3498db" stroke-width="1" opacity="0.5"/>
-
-  <!-- Bande RGB avant -->
-  <rect x="118" y="458" width="184" height="9" rx="4.5" fill="url(#rgbStrip)" opacity="0.92" filter="url(#btnGlow)"/>
-  <rect x="118" y="458" width="184" height="4" rx="2" fill="url(#specular)" opacity="0.5"/>
-
-  <!-- Logo -->
-  <text x="210" y="498" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="32" font-weight="800" fill="#3498db" letter-spacing="6">M40</text>
-  <text x="210" y="522" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="12" font-weight="600" fill="#888898" letter-spacing="8">ELITE</text>
-
-  <!-- Reflet coque -->
-  <path d="M120 52 C160 40 260 40 300 52 C280 90 240 110 210 112 C180 110 140 90 120 52 Z"
-        fill="url(#specular)"/>
+  <path d="M180 36 C248 36 298 92 298 188 L298 292 C298 362 248 418 180 428 C112 418 62 362 62 292 L62 188 C62 92 112 36 180 36 Z" fill="url(#shell)" stroke="url(#accent)" stroke-width="3"/>
+  <line x1="180" y1="58" x2="180" y2="130" stroke="url(#accent)" stroke-width="2.5"/>
+  <rect x="52" y="178" width="32" height="42" rx="6" fill="#14141c" stroke="#ff8c2a" stroke-width="2"/>
+  <text x="68" y="206" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="11" font-weight="700" fill="#ff8c2a">L1</text>
+  <rect x="52" y="224" width="32" height="42" rx="6" fill="#14141c" stroke="#ff8c2a" stroke-width="2"/>
+  <text x="68" y="252" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="11" font-weight="700" fill="#ff8c2a">L2</text>
+  <rect x="162" y="148" width="36" height="62" rx="10" fill="#080810" stroke="url(#accent)" stroke-width="2"/>
+  <ellipse cx="180" cy="118" rx="22" ry="32" fill="#101018" stroke="#606070" stroke-width="1.5"/>
+  <circle cx="180" cy="320" r="28" fill="#14141c" stroke="#606070" stroke-width="2"/>
+  <path d="M168 320h24M180 308v24" stroke="#3498db" stroke-width="2" stroke-linecap="round"/>
+  <text x="180" y="400" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="26" font-weight="800" fill="url(#accent)">ELITE M40</text>
 </svg>

@@ -5,8 +5,9 @@
       <stop offset="0%" stop-color="#2a1010"/>
       <stop offset="100%" stop-color="#0a0a0c"/>
     </linearGradient>
-    <filter id="glow"><feGaussianBlur stdDeviation="2"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow"><feGaussianBlur stdDeviation="3"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   </defs>
-  <rect width="128" height="128" rx="16" fill="url(#bg)" stroke="#e02626" stroke-width="2"/>
-  <text x="64" y="78" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="36" font-weight="700" fill="#e02626" filter="url(#glow)">D4</text>
+  <rect width="128" height="128" rx="20" fill="url(#bg)" stroke="#e02626" stroke-width="2"/>
+  <circle cx="64" cy="64" r="40" fill="#14141c" stroke="#e02626" stroke-width="1.5" opacity="0.5" filter="url(#glow)"/>
+  <text x="64" y="76" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="36" font-weight="800" fill="#e02626">IV</text>
 </svg>

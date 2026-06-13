@@ -1,16 +1,20 @@
 #include "TitleBarWidget.h"
+#include "WindowChromeButton.h"
 #include "../../core/Constants.h"
 #include "../../core/Enums.h"
 #include "../../core/AppState.h"
+#include "../../core/AssetGenerator.h"
 #include "../../core/EventBus.h"
 #include "../../services/ProfileService.h"
+#include <QComboBox>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QMenu>
+#include <QListView>
+#include <QMouseEvent>
 #include <QProgressBar>
-#include <QPushButton>
 #include <QStyle>
+#include <QVBoxLayout>
 
 TitleBarWidget::TitleBarWidget(QWidget* parent) : QWidget(parent)
 {
@@ -26,90 +30,178 @@ TitleBarWidget::TitleBarWidget(QWidget* parent) : QWidget(parent)
 void TitleBarWidget::buildUi()
 {
     auto* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(16, 6, 8, 6);
-    layout->setSpacing(12);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
-    m_sectionLabel = new QLabel(this);
+    auto* brand = new QFrame(this);
+    brand->setObjectName(QStringLiteral("titleBarBrand"));
+    auto* brandLayout = new QHBoxLayout(brand);
+    brandLayout->setContentsMargins(14, 0, 16, 0);
+    brandLayout->setSpacing(10);
+
+    auto* logo = new QLabel(brand);
+    logo->setObjectName(QStringLiteral("titleBarLogo"));
+    logo->setFixedSize(28, 28);
+    logo->setPixmap(AssetGenerator::instance().pixmap(QStringLiteral("assets/branding/app-mark.svg"), QSize(28, 28)));
+    logo->setScaledContents(true);
+
+    auto* titles = new QVBoxLayout();
+    titles->setContentsMargins(0, 0, 0, 0);
+    titles->setSpacing(0);
+
+    m_appNameLabel = new QLabel(Gx::App::Name, brand);
+    m_appNameLabel->setObjectName(QStringLiteral("titleBarAppName"));
+
+    m_sectionLabel = new QLabel(brand);
     m_sectionLabel->setObjectName(QStringLiteral("titleBarSection"));
-    layout->addWidget(m_sectionLabel);
-    layout->addStretch();
 
-    auto* enginePanel = new QFrame(this);
-    enginePanel->setObjectName(QStringLiteral("titleBarEngine"));
-    auto* engineLayout = new QHBoxLayout(enginePanel);
-    engineLayout->setContentsMargins(12, 4, 12, 4);
-    engineLayout->setSpacing(10);
+    titles->addWidget(m_appNameLabel);
+    titles->addWidget(m_sectionLabel);
+    brandLayout->addWidget(logo);
+    brandLayout->addLayout(titles);
+    layout->addWidget(brand);
 
-    auto* engineTitle = new QLabel(QStringLiteral("MOTEUR"), enginePanel);
+    layout->addStretch(1);
+
+    auto* strip = new QFrame(this);
+    strip->setObjectName(QStringLiteral("titleBarStrip"));
+    auto* stripLayout = new QHBoxLayout(strip);
+    stripLayout->setContentsMargins(14, 6, 14, 6);
+    stripLayout->setSpacing(14);
+
+    auto* engineBlock = new QFrame(strip);
+    engineBlock->setObjectName(QStringLiteral("titleBarEngine"));
+    auto* engineLayout = new QHBoxLayout(engineBlock);
+    engineLayout->setContentsMargins(10, 4, 10, 4);
+    engineLayout->setSpacing(8);
+
+    auto* engineTitle = new QLabel(QStringLiteral("MOTEUR"), engineBlock);
     engineTitle->setObjectName(QStringLiteral("titleBarEngineLabel"));
-    engineLayout->addWidget(engineTitle);
-
-    m_engineBadge = new QLabel(QStringLiteral("Actif"), enginePanel);
+    m_engineBadge = new QLabel(QStringLiteral("PRET"), engineBlock);
     m_engineBadge->setObjectName(QStringLiteral("titleBarEngineBadge"));
-    engineLayout->addWidget(m_engineBadge);
 
-    auto* cpuCol = new QVBoxLayout();
-    cpuCol->setSpacing(2);
-    auto* cpuRow = new QHBoxLayout();
-    auto* cpuLb = new QLabel(QStringLiteral("CPU"), enginePanel);
-    cpuLb->setObjectName(QStringLiteral("titleBarMeterLabel"));
-    m_cpuBar = new QProgressBar(enginePanel);
-    m_cpuBar->setObjectName(QStringLiteral("titleBarMeterBar"));
-    m_cpuBar->setProperty("accent", "cpu");
-    m_cpuBar->setRange(0, 100);
-    m_cpuBar->setFixedSize(72, 5);
-    m_cpuBar->setTextVisible(false);
-    cpuRow->addWidget(cpuLb);
-    cpuRow->addWidget(m_cpuBar);
-    cpuCol->addLayout(cpuRow);
+    auto* meters = new QVBoxLayout();
+    meters->setSpacing(3);
+    auto addMeter = [&](const QString& label, QProgressBar*& bar, const char* accent) {
+        auto* row = new QHBoxLayout();
+        row->setSpacing(6);
+        auto* lb = new QLabel(label, engineBlock);
+        lb->setObjectName(QStringLiteral("titleBarMeterLabel"));
+        bar = new QProgressBar(engineBlock);
+        bar->setObjectName(QStringLiteral("titleBarMeterBar"));
+        bar->setProperty("accent", accent);
+        bar->setRange(0, 100);
+        bar->setFixedSize(64, 4);
+        bar->setTextVisible(false);
+        row->addWidget(lb);
+        row->addWidget(bar);
+        meters->addLayout(row);
+    };
+    addMeter(QStringLiteral("CPU"), m_cpuBar, "cpu");
+    addMeter(QStringLiteral("RAM"), m_ramBar, "ram");
 
-    auto* ramRow = new QHBoxLayout();
-    auto* ramLb = new QLabel(QStringLiteral("RAM"), enginePanel);
-    ramLb->setObjectName(QStringLiteral("titleBarMeterLabel"));
-    m_ramBar = new QProgressBar(enginePanel);
-    m_ramBar->setObjectName(QStringLiteral("titleBarMeterBar"));
-    m_ramBar->setProperty("accent", "ram");
-    m_ramBar->setRange(0, 100);
-    m_ramBar->setFixedSize(72, 5);
-    m_ramBar->setTextVisible(false);
-    ramRow->addWidget(ramLb);
-    ramRow->addWidget(m_ramBar);
-    cpuCol->addLayout(ramRow);
-    engineLayout->addLayout(cpuCol);
-
-    auto* ver = new QLabel(Gx::App::Version, enginePanel);
+    auto* ver = new QLabel(Gx::App::Version, engineBlock);
     ver->setObjectName(QStringLiteral("titleBarVersion"));
+
+    engineLayout->addWidget(engineTitle);
+    engineLayout->addWidget(m_engineBadge);
+    engineLayout->addLayout(meters);
     engineLayout->addWidget(ver);
+    stripLayout->addWidget(engineBlock);
 
-    layout->addWidget(enginePanel);
+    auto* sep = new QFrame(strip);
+    sep->setObjectName(QStringLiteral("titleBarSep"));
+    sep->setFixedWidth(1);
+    sep->setFixedHeight(32);
+    stripLayout->addWidget(sep);
 
-    m_profileLabel = new QLabel(this);
-    m_profileLabel->setObjectName(QStringLiteral("titleBarProfile"));
-    layout->addWidget(m_profileLabel);
+    auto* profileBlock = new QHBoxLayout();
+    profileBlock->setSpacing(8);
+    auto* gameLabel = new QLabel(QStringLiteral("PROFIL"), strip);
+    gameLabel->setObjectName(QStringLiteral("titleBarGameLabel"));
+    m_gameCombo = new QComboBox(strip);
+    m_gameCombo->setObjectName(QStringLiteral("titleBarGameCombo"));
+    m_gameCombo->setMinimumWidth(240);
+    m_gameCombo->setMinimumHeight(30);
+    if (auto* view = qobject_cast<QListView*>(m_gameCombo->view()))
+    {
+        view->setTextElideMode(Qt::ElideNone);
+        view->setMinimumWidth(300);
+    }
+    connect(m_gameCombo, QOverload<int>::of(&QComboBox::activated), this, [](int index) {
+        ProfileService::instance().applyProfile(index);
+    });
+    profileBlock->addWidget(gameLabel);
+    profileBlock->addWidget(m_gameCombo);
+    stripLayout->addLayout(profileBlock);
 
-    auto* changeBtn = new QPushButton(QStringLiteral("Changer"), this);
-    changeBtn->setObjectName(QStringLiteral("titleBarChangeBtn"));
-    connect(changeBtn, &QPushButton::clicked, this, &TitleBarWidget::showProfileMenu);
-    layout->addWidget(changeBtn);
+    layout->addWidget(strip);
 
+    auto* chrome = new QFrame(this);
+    chrome->setObjectName(QStringLiteral("titleBarChrome"));
+    auto* chromeLayout = new QHBoxLayout(chrome);
+    chromeLayout->setContentsMargins(0, 0, 0, 0);
+    chromeLayout->setSpacing(0);
+
+    auto* minBtn = new WindowChromeButton(WindowChromeButton::Kind::Minimize, chrome);
+    m_maxBtn = new WindowChromeButton(WindowChromeButton::Kind::Maximize, chrome);
+    auto* closeBtn = new WindowChromeButton(WindowChromeButton::Kind::Close, chrome);
+
+    minBtn->setToolTip(QStringLiteral("Reduire"));
+    m_maxBtn->setToolTip(QStringLiteral("Plein ecran"));
+    closeBtn->setToolTip(QStringLiteral("Fermer"));
+
+    connect(minBtn, &QPushButton::clicked, this, &TitleBarWidget::minimizeClicked);
+    connect(m_maxBtn, &QPushButton::clicked, this, &TitleBarWidget::maximizeClicked);
+    connect(closeBtn, &QPushButton::clicked, this, &TitleBarWidget::closeClicked);
+
+    chromeLayout->addWidget(minBtn);
+    chromeLayout->addWidget(m_maxBtn);
+    chromeLayout->addWidget(closeBtn);
+    layout->addWidget(chrome);
+
+    reloadGameCombo();
     refresh();
 }
 
-void TitleBarWidget::showProfileMenu()
+void TitleBarWidget::setMaximizedState(bool maximized)
 {
-    QMenu menu(this);
-    const auto& profiles = ProfileService::instance().model().profiles();
-    const int active = ProfileService::instance().activeIndex();
-    for (int i = 0; i < profiles.size(); ++i)
+    m_maximized = maximized;
+    if (m_maxBtn)
     {
-        QAction* action = menu.addAction(profiles.at(i).name);
-        action->setCheckable(true);
-        action->setChecked(i == active);
-        connect(action, &QAction::triggered, this, [i]() {
-            ProfileService::instance().applyProfile(i);
-        });
+        m_maxBtn->setKind(maximized ? WindowChromeButton::Kind::Restore
+                                    : WindowChromeButton::Kind::Maximize);
+        m_maxBtn->setToolTip(maximized ? QStringLiteral("Restaurer")
+                                       : QStringLiteral("Plein ecran"));
     }
-    menu.exec(mapToGlobal(m_profileLabel->geometry().bottomLeft()));
+}
+
+bool TitleBarWidget::isInteractiveTarget(QWidget* target) const
+{
+    while (target && target != this)
+    {
+        if (qobject_cast<QPushButton*>(target) || qobject_cast<QComboBox*>(target))
+            return true;
+        target = target->parentWidget();
+    }
+    return false;
+}
+
+void TitleBarWidget::reloadGameCombo()
+{
+    if (!m_gameCombo)
+        return;
+
+    m_gameCombo->blockSignals(true);
+    m_gameCombo->clear();
+
+    const auto& profiles = ProfileService::instance().model().profiles();
+    for (const auto& profile : profiles)
+        m_gameCombo->addItem(QStringLiteral("%1  ·  %2").arg(profile.game, profile.name), profile.name);
+
+    const int active = ProfileService::instance().activeIndex();
+    m_gameCombo->setCurrentIndex(active >= 0 ? qBound(0, active, profiles.size() - 1) : 0);
+    m_gameCombo->blockSignals(false);
 }
 
 void TitleBarWidget::refresh()
@@ -117,12 +209,16 @@ void TitleBarWidget::refresh()
     const auto& st = AppStateStore::instance().state();
     if (m_sectionLabel)
         m_sectionLabel->setText(navSectionLabel(st.currentSection));
-    if (m_profileLabel)
-        m_profileLabel->setText(QStringLiteral("%1 — Profil actif").arg(st.activeProfileName));
+    if (m_gameCombo)
+    {
+        m_gameCombo->blockSignals(true);
+        reloadGameCombo();
+        m_gameCombo->blockSignals(false);
+    }
     if (m_engineBadge)
     {
         const bool on = st.engineActive && st.macroMasterEnabled;
-        m_engineBadge->setText(on ? QStringLiteral("Macros ON") : QStringLiteral("Actif"));
+        m_engineBadge->setText(on ? QStringLiteral("MACROS ON") : QStringLiteral("PRET"));
         m_engineBadge->setProperty("running", on);
         m_engineBadge->style()->unpolish(m_engineBadge);
         m_engineBadge->style()->polish(m_engineBadge);
@@ -131,4 +227,46 @@ void TitleBarWidget::refresh()
         m_cpuBar->setValue(int(st.cpuUsage * 100));
     if (m_ramBar)
         m_ramBar->setValue(int(st.ramUsage * 100));
+}
+
+void TitleBarWidget::mousePressEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton && !isInteractiveTarget(childAt(event->pos())))
+    {
+        m_dragging = true;
+        m_dragOffset = event->globalPosition().toPoint() - window()->frameGeometry().topLeft();
+        event->accept();
+        return;
+    }
+    QWidget::mousePressEvent(event);
+}
+
+void TitleBarWidget::mouseMoveEvent(QMouseEvent* event)
+{
+    if (m_dragging && (event->buttons() & Qt::LeftButton))
+    {
+        if (QWidget* w = window())
+            w->move(event->globalPosition().toPoint() - m_dragOffset);
+        event->accept();
+        return;
+    }
+    QWidget::mouseMoveEvent(event);
+}
+
+void TitleBarWidget::mouseReleaseEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton)
+        m_dragging = false;
+    QWidget::mouseReleaseEvent(event);
+}
+
+void TitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
+{
+    if (!isInteractiveTarget(childAt(event->pos())))
+    {
+        emit maximizeClicked();
+        event->accept();
+        return;
+    }
+    QWidget::mouseDoubleClickEvent(event);
 }

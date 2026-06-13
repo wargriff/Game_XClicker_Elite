@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+  <rect width="200" height="120" rx="12" fill="#101016" stroke="#22222e"/>
+  <rect x="70" y="30" width="60" height="60" rx="30" fill="#14141c" stroke="#606070" stroke-width="2"/>
+  <path d="M85 55h30M100 40v30" stroke="#606070" stroke-width="2" stroke-linecap="round"/>
+  <text x="100" y="105" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="12" fill="#808090">Aucun périphérique</text>
+</svg>

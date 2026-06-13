@@ -1,9 +1,46 @@
-/* GAMEX CLICKER — theme rouge premium (lisibilite amelioree) */
+/* GAMEX MACRO ELITE — shell AAA gaming launcher */
 QWidget#mainWindow {
-    background-color: #0a0a0c;
+    background: transparent;
     color: #f4f4f8;
     font-family: "Segoe UI", sans-serif;
     font-size: 14px;
+}
+
+QWidget#mainShell {
+    background-color: rgba(8, 8, 10, 235);
+    border-radius: 10px;
+}
+
+QStackedWidget#animatedStack {
+    background: transparent;
+    border: none;
+}
+
+QWidget#deviceDockPremium {
+    background: transparent;
+    border: none;
+}
+
+QWidget#mouseWidget {
+    background-color: #0a0c14;
+    border: 2px solid rgba(52, 152, 219, 100);
+    border-radius: 16px;
+}
+
+QLabel#pageBanner {
+    background: transparent;
+    border-radius: 12px;
+}
+
+QSplitter#deviceCenterSplitter::handle {
+    background-color: #1a2430;
+    border: 1px solid #3498db;
+    border-radius: 4px;
+    margin: 4px 2px;
+}
+
+QSplitter#deviceCenterSplitter::handle:hover {
+    background-color: #2a5080;
 }
 
 QWidget#deviceCenterPage {
@@ -291,12 +328,145 @@ QFrame#keyConfigPanel {
     background-color: #14141c;
     border: 1px solid #2e2e3a;
     border-radius: 12px;
-    padding: 20px;
 }
 
-QFrame#keyConfigPanel QLabel {
-    color: #c8c8d4;
+QScrollArea#keyConfigScroll {
+    background: transparent;
+    border: none;
+}
+
+QWidget#keyConfigForm {
+    background: transparent;
+}
+
+QLabel#keyConfigLabel {
+    color: #808090;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+}
+
+QLabel#keyConfigValue {
+    color: #ffffff;
     font-size: 14px;
+    font-weight: 600;
+    padding: 8px 12px;
+    background-color: #101016;
+    border: 1px solid #22222e;
+    border-radius: 8px;
+}
+
+QComboBox#macroAssignCombo {
+    background-color: #101016;
+    border: 1px solid #2e2e3a;
+    border-radius: 8px;
+    color: #f4f4f8;
+    padding: 8px 12px;
+    min-height: 38px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QComboBox#macroAssignCombo:hover {
+    border-color: #3498db;
+}
+
+QComboBox#macroAssignCombo::drop-down {
+    border: none;
+    width: 28px;
+}
+
+QComboBox#macroAssignCombo::down-arrow {
+    image: none;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #3498db;
+    margin-right: 10px;
+}
+
+QComboBox#macroAssignCombo QAbstractItemView {
+    background-color: #101016;
+    color: #f4f4f8;
+    border: 1px solid #3498db;
+    border-radius: 8px;
+    padding: 4px;
+    outline: none;
+    min-width: 440px;
+}
+
+QComboBox#macroAssignCombo QAbstractItemView::item {
+    min-height: 32px;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+QComboBox#macroAssignCombo QAbstractItemView::item:hover {
+    background-color: #1a2430;
+}
+
+QComboBox#macroAssignCombo QAbstractItemView::item:selected {
+    background-color: #2a5080;
+    color: #ffffff;
+}
+
+QDoubleSpinBox#keyConfigSpin, QSpinBox#keyConfigSpin {
+    background-color: #101016;
+    border: 1px solid #2e2e3a;
+    border-radius: 8px;
+    color: #f4f4f8;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+QDoubleSpinBox#keyConfigSpin:focus, QSpinBox#keyConfigSpin:focus {
+    border-color: #3498db;
+}
+
+QCheckBox#keyConfigToggle::indicator {
+    width: 44px;
+    height: 24px;
+    border-radius: 12px;
+    background: #e02626;
+    border: 1px solid #a01818;
+}
+
+QCheckBox#keyConfigToggle::indicator:unchecked {
+    background: #3a3a48;
+    border-color: #2e2e3a;
+}
+
+QPushButton#l2LaunchBtn {
+    background-color: #22222c;
+    color: #c8c8d4;
+    border: 2px solid #3a3a48;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 12px 16px;
+}
+
+QPushButton#l2LaunchBtn:hover {
+    border-color: #3498db;
+    color: #ffffff;
+}
+
+QPushButton#l2LaunchBtn[macroOn="true"] {
+    background-color: #142818;
+    color: #2ecc71;
+    border-color: #2ecc71;
+}
+
+QPushButton#l2LaunchBtn[macroOn="true"]:hover {
+    background-color: #1a3820;
+    border-color: #3dde84;
+}
+
+QFrame#keyConfigPanel QPushButton#primaryButton,
+QFrame#keyConfigPanel QPushButton#secondaryButton {
+    min-height: 42px;
+    padding: 10px 16px;
 }
 
 QFrame#keyConfigPanel QLabel#panelHeader {

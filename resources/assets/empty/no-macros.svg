@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+  <rect width="200" height="120" rx="12" fill="#101016" stroke="#22222e"/>
+  <rect x="20" y="30" width="160" height="60" rx="8" fill="#14141c" stroke="#3498db" stroke-width="2"/>
+  <text x="100" y="72" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="14" fill="#808090">Aucune macro</text>
+</svg>

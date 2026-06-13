@@ -32,7 +32,7 @@ void SidebarWidget::buildUi()
     auto* logoRow = new QHBoxLayout();
     auto* logoIcon = new QLabel(this);
     logoIcon->setFixedSize(32, 32);
-    logoIcon->setPixmap(AssetGenerator::instance().pixmap(QStringLiteral("logos/gamex-mark.svg"), QSize(32, 32)));
+    logoIcon->setPixmap(AssetGenerator::instance().pixmap(QStringLiteral("assets/branding/app-mark.svg"), QSize(32, 32)));
     logoIcon->setScaledContents(true);
     logoRow->addWidget(logoIcon);
 
@@ -44,9 +44,10 @@ void SidebarWidget::buildUi()
     layout->addSpacing(12);
 
     const NavSection sections[] = {
-        NavSection::MissionControl, NavSection::DeviceCenter, NavSection::MacroStudio,
-        NavSection::MacroLibrary, NavSection::ProfileManager, NavSection::ActivityMonitor,
-        NavSection::AnalyticsCenter, NavSection::MobileCommand, NavSection::LightingEngine
+        NavSection::ProfileManager,
+        NavSection::DeviceCenter,
+        NavSection::MacroLibrary,
+        NavSection::LightingEngine
     };
 
     for (NavSection s : sections)

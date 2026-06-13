@@ -26,6 +26,7 @@ public:
 
     QIcon icon(const QString& relativePath, const QSize& size = QSize(24, 24)) const;
     QPixmap pixmap(const QString& relativePath, const QSize& size) const;
+    QPixmap loadPixmap(const QString& relativePath) const;
 
 private:
     AssetGenerator();

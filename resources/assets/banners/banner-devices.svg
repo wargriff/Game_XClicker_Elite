@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#141824"/>
+      <stop offset="100%" stop-color="#0a0a0c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="280" rx="16" fill="url(#g)" stroke="#282834"/>
+  <text x="40" y="80" font-family="Segoe UI,sans-serif" font-size="36" font-weight="700" fill="#f4f4f8">Peripheriques</text>
+  <text x="40" y="130" font-family="Segoe UI,sans-serif" font-size="18" fill="#9090a0">Souris Elite M40 - Clavier - Assignation macros</text>
+  <ellipse cx="980" cy="140" rx="160" ry="90" fill="#181820" stroke="#3498db" stroke-width="2" opacity="0.6"/>
+  <rect x="860" y="100" width="36" height="80" rx="8" fill="#14141c" stroke="#ff8c2a" stroke-width="2"/>
+  <text x="878" y="150" font-size="14" font-weight="700" fill="#ff8c2a">L1</text>
+</svg>

@@ -1,4 +1,5 @@
 #include "AssetGenerator.h"
+#include "AppPaths.h"
 #include "Logger.h"
 #include <QCoreApplication>
 #include <QDir>
@@ -13,7 +14,11 @@ namespace
 {
 const char* kSubDirs[] = {
     "icons", "devices", "previews", "wallpapers",
-    "logos", "avatars", "themes", "animations"
+    "logos", "avatars", "themes", "animations",
+    "assets/branding", "assets/status", "assets/ui",
+    "assets/games", "assets/macro", "assets/badges",
+    "assets/empty", "assets/mouse", "assets/lighting",
+    "assets/keyboard", "assets/banners"
 };
 
 QByteArray placeholderSvg(const QString& title, const QString& subtitle)
@@ -107,7 +112,45 @@ void AssetGenerator::buildManifest()
         QStringLiteral("themes/gamex-dark.json"),
         QStringLiteral("animations/glow-pulse.svg"),
         QStringLiteral("previews/keyboard-rgb-preview.svg"),
-        QStringLiteral("previews/mouse-rgb-preview.svg")
+        QStringLiteral("previews/mouse-rgb-preview.svg"),
+        QStringLiteral("assets/branding/app-logo.svg"),
+        QStringLiteral("assets/branding/app-mark.svg"),
+        QStringLiteral("assets/status/dot-green.svg"),
+        QStringLiteral("assets/status/dot-orange.svg"),
+        QStringLiteral("assets/status/dot-red.svg"),
+        QStringLiteral("assets/ui/btn-add.svg"),
+        QStringLiteral("assets/ui/btn-edit.svg"),
+        QStringLiteral("assets/ui/btn-delete.svg"),
+        QStringLiteral("assets/ui/btn-save.svg"),
+        QStringLiteral("assets/ui/btn-test.svg"),
+        QStringLiteral("assets/games/diablo-iv.svg"),
+        QStringLiteral("assets/games/diablo-iii.svg"),
+        QStringLiteral("assets/games/wow.svg"),
+        QStringLiteral("assets/games/valorant.svg"),
+        QStringLiteral("assets/macro/autoclick.svg"),
+        QStringLiteral("assets/macro/toggle-l1.svg"),
+        QStringLiteral("assets/macro/timeline.svg"),
+        QStringLiteral("assets/badges/cloud.svg"),
+        QStringLiteral("assets/badges/engine-on.svg"),
+        QStringLiteral("assets/badges/engine-off.svg"),
+        QStringLiteral("assets/badges/profile-active.svg"),
+        QStringLiteral("assets/empty/no-macros.svg"),
+        QStringLiteral("assets/empty/no-devices.svg"),
+        QStringLiteral("assets/empty/no-profiles.svg"),
+        QStringLiteral("assets/mouse/elite-m40-top.svg"),
+        QStringLiteral("assets/mouse/elite-m40-side.svg"),
+        QStringLiteral("assets/mouse/elite-m40-hero.svg"),
+        QStringLiteral("assets/banners/banner-profiles.svg"),
+        QStringLiteral("assets/banners/banner-devices.svg"),
+        QStringLiteral("assets/banners/banner-macros.svg"),
+        QStringLiteral("assets/banners/banner-lighting.svg"),
+        QStringLiteral("icons/nav-profiles.svg"),
+        QStringLiteral("icons/nav-devices.svg"),
+        QStringLiteral("icons/nav-macros.svg"),
+        QStringLiteral("icons/nav-lighting.svg"),
+        QStringLiteral("assets/lighting/rgb-wave.svg"),
+        QStringLiteral("assets/lighting/rgb-static.svg"),
+        QStringLiteral("assets/keyboard/tkl-blue.svg")
     };
 
     m_svgTemplates[QStringLiteral("icons/mission-control.svg")] = placeholderSvg(QStringLiteral("Mission"), QStringLiteral("Control"));
@@ -251,6 +294,7 @@ bool AssetGenerator::ensureAll(const QString& resourcesRoot)
         { "devices/monitor.svg", "previews/monitor-4k.png" },
         { "previews/keyboard-rgb-preview.svg", "previews/keyboard-rgb-preview-4k.png" },
         { "previews/mouse-rgb-preview.svg", "previews/mouse-rgb-preview-4k.png" },
+        { "assets/mouse/elite-m40-hero.svg", "previews/mouse-elite-m40-4k.png" },
         { "wallpapers/gamex-dark.svg", "wallpapers/gamex-dark-4k.png" }
     };
 
@@ -263,6 +307,12 @@ bool AssetGenerator::ensureAll(const QString& resourcesRoot)
 
 QString AssetGenerator::resolve(const QString& relativePath) const
 {
+    if (relativePath.startsWith(QStringLiteral("assets/")))
+    {
+        const QString assetRel = relativePath.mid(QStringLiteral("assets/").size());
+        return AppPaths::resolveAsset(assetRel);
+    }
+
     const QString qrc = QStringLiteral(":/") + relativePath;
     if (QFileInfo::exists(qrc))
         return qrc;
@@ -270,6 +320,10 @@ QString AssetGenerator::resolve(const QString& relativePath) const
     const QString disk = diskPath(relativePath);
     if (QFileInfo::exists(disk))
         return disk;
+
+    const QString inResources = QDir(AppPaths::resourcesRoot()).filePath(relativePath);
+    if (QFileInfo::exists(inResources))
+        return inResources;
 
     if (relativePath.endsWith(QStringLiteral(".svg")))
     {
@@ -293,12 +347,37 @@ QIcon AssetGenerator::icon(const QString& relativePath, const QSize& size) const
     return QIcon(pixmap(relativePath, size));
 }
 
+QPixmap AssetGenerator::loadPixmap(const QString& relativePath) const
+{
+    const QString path = resolve(relativePath);
+    QPixmap pm(path);
+    if (!pm.isNull())
+        return pm;
+
+    if (path.startsWith(QStringLiteral(":/")))
+    {
+        QPixmap fromQrc(path);
+        if (!fromQrc.isNull())
+            return fromQrc;
+    }
+    return {};
+}
+
 QPixmap AssetGenerator::pixmap(const QString& relativePath, const QSize& size) const
 {
     const QString path = resolve(relativePath);
     QSvgRenderer renderer(path);
     if (!renderer.isValid())
-        return {};
+    {
+        QPixmap fallback(size);
+        fallback.fill(Qt::transparent);
+        QPainter painter(&fallback);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setBrush(QColor(20, 20, 28));
+        painter.setPen(QPen(QColor(52, 152, 219), 2));
+        painter.drawRoundedRect(QRectF(QPointF(1, 1), size - QSize(2, 2)), 6, 6);
+        return fallback;
+    }
 
     QPixmap pm(size);
     pm.fill(Qt::transparent);

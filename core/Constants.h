@@ -25,8 +25,11 @@ namespace Layout
 {
     constexpr int WindowWidth    = 1440;
     constexpr int WindowHeight   = 900;
+    constexpr int WindowMinWidth = 1100;
+    constexpr int WindowMinHeight = 680;
+    constexpr int ResizeBorder   = 8;
     constexpr int SidebarWidth   = 220;
-    constexpr int TitleBarHeight = 56;
+    constexpr int TitleBarHeight = 52;
     constexpr int DockHeight     = 88;
     constexpr int Radius         = 8;
 }

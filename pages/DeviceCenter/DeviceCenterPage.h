@@ -8,6 +8,8 @@ class QLabel;
 class QDoubleSpinBox;
 class QSpinBox;
 class QCheckBox;
+class QPushButton;
+class MouseWidget;
 
 class DeviceCenterPage : public QWidget
 {
@@ -25,8 +27,12 @@ private slots:
 
 private:
     void updatePanelHeader();
+    void toggleMacroMaster();
+    void updateL2LaunchButton();
+    static bool isMasterToggle(const QString& keyLabel, bool toggleFlag);
 
     QTabWidget* m_tabs = nullptr;
+    MouseWidget* m_mouseWidget = nullptr;
     QLabel* m_panelHeader = nullptr;
     QLabel* m_targetLabel = nullptr;
     QComboBox* m_macroCombo = nullptr;
@@ -34,6 +40,7 @@ private:
     QSpinBox* m_delaySpin = nullptr;
     QCheckBox* m_activeToggle = nullptr;
     QLabel* m_toggleHint = nullptr;
+    QPushButton* m_l2LaunchBtn = nullptr;
     bool m_mouseMode = false;
     QString m_mouseButton = QStringLiteral("Gauche");
     QString m_keyLabel = QStringLiteral("W");

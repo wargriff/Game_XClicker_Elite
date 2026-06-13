@@ -2,11 +2,9 @@
 
 #include "../../widgets/keyboard/KeyboardWidget.h"
 #include "../../widgets/mouse/MouseWidget.h"
-#include "../../widgets/rgb/RGBPanelWidget.h"
-#include "../../widgets/rgb/RGBPreviewWidget.h"
-#include "../../widgets/stats/StatsPanelWidget.h"
+#include "../../core/AssetGenerator.h"
+#include "../../services/MacroEngine.h"
 #include "../../services/MacroService.h"
-#include "../../services/RGBService.h"
 #include "../../core/AppState.h"
 #include "../../core/EventBus.h"
 #include "../../core/Enums.h"
@@ -14,12 +12,14 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDoubleSpinBox>
-#include <QFormLayout>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QListView>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QSpinBox>
+#include <QSplitter>
 #include <QStackedWidget>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -32,16 +32,22 @@ DeviceCenterPage::DeviceCenterPage(QWidget* parent) : QWidget(parent)
     root->setContentsMargins(24, 16, 24, 16);
     root->setSpacing(14);
 
-    auto* pageTitle = new QLabel(QStringLiteral("Device Center"), this);
-    pageTitle->setObjectName(QStringLiteral("pageTitle"));
-    root->addWidget(pageTitle);
+    auto* banner = new QLabel(this);
+    banner->setObjectName(QStringLiteral("pageBanner"));
+    banner->setPixmap(AssetGenerator::instance().pixmap(
+        QStringLiteral("assets/banners/banner-devices.svg"), QSize(900, 120)));
+    banner->setScaledContents(true);
+    banner->setFixedHeight(120);
+    root->addWidget(banner);
 
     auto* deviceStack = new QStackedWidget(this);
 
     auto* mousePage = new QWidget(this);
     auto* mouseLayout = new QVBoxLayout(mousePage);
     mouseLayout->setContentsMargins(0, 0, 0, 0);
+
     auto* mouseWidget = new MouseWidget(mousePage);
+    m_mouseWidget = mouseWidget;
     mouseLayout->addWidget(mouseWidget, 1);
 
     auto* kbPage = new QWidget(this);
@@ -70,98 +76,152 @@ DeviceCenterPage::DeviceCenterPage(QWidget* parent) : QWidget(parent)
     header->addWidget(deviceCombo);
     root->addLayout(header);
 
-    auto* body = new QHBoxLayout();
-    body->setSpacing(20);
+    auto* bodySplitter = new QSplitter(Qt::Horizontal, this);
+    bodySplitter->setObjectName(QStringLiteral("deviceCenterSplitter"));
+    bodySplitter->setChildrenCollapsible(false);
+    bodySplitter->setHandleWidth(10);
 
-    auto* left = new QVBoxLayout();
+    auto* leftHost = new QWidget(bodySplitter);
+    auto* left = new QVBoxLayout(leftHost);
+    left->setContentsMargins(0, 0, 0, 0);
     left->addWidget(deviceStack, 1);
 
     auto* legend = new QHBoxLayout();
     legend->setSpacing(20);
     auto addLeg = [&](const QString& html) {
-        auto* lb = new QLabel(html, this);
+        auto* lb = new QLabel(html, leftHost);
         lb->setTextFormat(Qt::RichText);
         lb->setStyleSheet(QStringLiteral("color: #b0b0bc; font-size: 13px;"));
         legend->addWidget(lb);
     };
     addLeg(QStringLiteral("<span style='color:#3498db;font-size:14px'>●</span> Contour bleu"));
     addLeg(QStringLiteral("<span style='color:#e02626;font-size:14px'>●</span> Macro"));
-    addLeg(QStringLiteral("<span style='color:#ff8c2a;font-size:14px'>●</span> L1 / L2 gauche"));
+    addLeg(QStringLiteral("<span style='color:#2ecc71;font-size:14px'>●</span> L2 ON / OFF macros"));
     legend->addStretch();
     left->addLayout(legend);
-    body->addLayout(left, 3);
 
-    auto* right = new QFrame(this);
+    auto* right = new QFrame(bodySplitter);
     right->setObjectName(QStringLiteral("keyConfigPanel"));
-    right->setMinimumWidth(300);
+    right->setMinimumWidth(360);
     auto* panelLayout = new QVBoxLayout(right);
-    panelLayout->setSpacing(12);
+    panelLayout->setContentsMargins(20, 18, 20, 18);
+    panelLayout->setSpacing(0);
 
-    m_panelHeader = new QLabel(QStringLiteral("TOUCHE W"), this);
+    m_panelHeader = new QLabel(QStringLiteral("TOUCHE W"), right);
     m_panelHeader->setObjectName(QStringLiteral("panelHeader"));
     panelLayout->addWidget(m_panelHeader);
+    panelLayout->addSpacing(16);
 
-    auto* form = new QFormLayout();
-    form->setSpacing(10);
-    form->setLabelAlignment(Qt::AlignLeft);
+    auto* scroll = new QScrollArea(right);
+    scroll->setObjectName(QStringLiteral("keyConfigScroll"));
+    scroll->setWidgetResizable(true);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scroll->setFrameShape(QFrame::NoFrame);
 
-    m_targetLabel = new QLabel(QStringLiteral("Touche W"), this);
-    form->addRow(QStringLiteral("Cible"), m_targetLabel);
+    auto* formHost = new QWidget(scroll);
+    formHost->setObjectName(QStringLiteral("keyConfigForm"));
+    auto* form = new QVBoxLayout(formHost);
+    form->setContentsMargins(0, 0, 4, 0);
+    form->setSpacing(16);
 
-    m_macroCombo = new QComboBox(this);
-    form->addRow(QStringLiteral("Macro assignee"), m_macroCombo);
+    auto addFieldBlock = [&](const QString& labelText, QWidget* field) {
+        auto* block = new QVBoxLayout();
+        block->setSpacing(6);
+        auto* label = new QLabel(labelText, formHost);
+        label->setObjectName(QStringLiteral("keyConfigLabel"));
+        block->addWidget(label);
+        block->addWidget(field);
+        form->addLayout(block);
+    };
 
-    m_cpsSpin = new QDoubleSpinBox(this);
+    m_targetLabel = new QLabel(QStringLiteral("Touche W"), formHost);
+    m_targetLabel->setObjectName(QStringLiteral("keyConfigValue"));
+    m_targetLabel->setWordWrap(true);
+    addFieldBlock(QStringLiteral("Cible"), m_targetLabel);
+
+    m_macroCombo = new QComboBox(formHost);
+    m_macroCombo->setObjectName(QStringLiteral("macroAssignCombo"));
+    m_macroCombo->setMinimumHeight(38);
+    m_macroCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    if (auto* view = qobject_cast<QListView*>(m_macroCombo->view()))
+    {
+        view->setTextElideMode(Qt::ElideNone);
+        view->setMinimumWidth(440);
+        view->setSpacing(2);
+    }
+    addFieldBlock(QStringLiteral("Macro assignee"), m_macroCombo);
+
+    m_cpsSpin = new QDoubleSpinBox(formHost);
+    m_cpsSpin->setObjectName(QStringLiteral("keyConfigSpin"));
     m_cpsSpin->setRange(0.0, 50.0);
     m_cpsSpin->setSingleStep(0.5);
     m_cpsSpin->setDecimals(1);
     m_cpsSpin->setSuffix(QStringLiteral(" CPS"));
-    form->addRow(QStringLiteral("Vitesse CPS"), m_cpsSpin);
+    m_cpsSpin->setMinimumHeight(36);
+    addFieldBlock(QStringLiteral("Vitesse CPS"), m_cpsSpin);
 
-    m_delaySpin = new QSpinBox(this);
+    m_delaySpin = new QSpinBox(formHost);
+    m_delaySpin->setObjectName(QStringLiteral("keyConfigSpin"));
     m_delaySpin->setRange(0, 2000);
     m_delaySpin->setSuffix(QStringLiteral(" ms"));
-    form->addRow(QStringLiteral("Delai"), m_delaySpin);
+    m_delaySpin->setMinimumHeight(36);
+    addFieldBlock(QStringLiteral("Delai"), m_delaySpin);
 
-    m_toggleHint = new QLabel(QStringLiteral("Bouton lateral L1 (XButton1) : active/desactive les autoclicks 1-2-3-4"), this);
+    m_toggleHint = new QLabel(
+        QStringLiteral("Bouton lateral L2 (XButton1 ou XButton2) : clic souris ou bouton L2 a l'ecran"),
+        formHost);
     m_toggleHint->setObjectName(QStringLiteral("toggleHint"));
+    m_toggleHint->setWordWrap(true);
     m_toggleHint->hide();
-    form->addRow(QString(), m_toggleHint);
+    form->addWidget(m_toggleHint);
+
+    m_l2LaunchBtn = new QPushButton(QStringLiteral("L2 — MACROS OFF"), formHost);
+    m_l2LaunchBtn->setObjectName(QStringLiteral("l2LaunchBtn"));
+    m_l2LaunchBtn->setMinimumHeight(52);
+    m_l2LaunchBtn->setCursor(Qt::PointingHandCursor);
+    m_l2LaunchBtn->hide();
+    form->addWidget(m_l2LaunchBtn);
+
+    auto* activeBlock = new QVBoxLayout();
+    activeBlock->setSpacing(6);
+    auto* activeLabel = new QLabel(QStringLiteral("Actif"), formHost);
+    activeLabel->setObjectName(QStringLiteral("keyConfigLabel"));
+    activeBlock->addWidget(activeLabel);
 
     auto* activeRow = new QHBoxLayout();
-    auto* activeLabel = new QLabel(QStringLiteral("Actif"), this);
-    m_activeToggle = new QCheckBox(this);
+    activeRow->setContentsMargins(0, 0, 0, 0);
+    m_activeToggle = new QCheckBox(formHost);
+    m_activeToggle->setObjectName(QStringLiteral("keyConfigToggle"));
     m_activeToggle->setChecked(true);
-    m_activeToggle->setStyleSheet(QStringLiteral(
-        "QCheckBox::indicator { width: 40px; height: 22px; border-radius: 11px; background: #e02626; }"
-        "QCheckBox::indicator:unchecked { background: #3a3a48; }"));
-    activeRow->addWidget(activeLabel);
     activeRow->addStretch();
     activeRow->addWidget(m_activeToggle);
-    form->addRow(activeRow);
+    activeBlock->addLayout(activeRow);
+    form->addLayout(activeBlock);
 
-    panelLayout->addLayout(form);
-    panelLayout->addStretch();
+    form->addStretch();
+    scroll->setWidget(formHost);
+    panelLayout->addWidget(scroll, 1);
 
     auto* btns = new QHBoxLayout();
-    auto* save = new QPushButton(QStringLiteral("Enregistrer"), this);
+    btns->setContentsMargins(0, 14, 0, 0);
+    btns->setSpacing(12);
+    auto* save = new QPushButton(QStringLiteral("Enregistrer"), right);
     save->setObjectName(QStringLiteral("primaryButton"));
-    auto* test = new QPushButton(QStringLiteral("Tester"), this);
+    save->setMinimumWidth(160);
+    auto* test = new QPushButton(QStringLiteral("Tester"), right);
     test->setObjectName(QStringLiteral("secondaryButton"));
-    btns->addWidget(test);
-    btns->addWidget(save);
+    test->setMinimumWidth(140);
+    btns->addWidget(test, 1);
+    btns->addWidget(save, 1);
     panelLayout->addLayout(btns);
 
-    body->addWidget(right, 1);
-    root->addLayout(body, 1);
+    bodySplitter->addWidget(leftHost);
+    bodySplitter->addWidget(right);
+    bodySplitter->setStretchFactor(0, 2);
+    bodySplitter->setStretchFactor(1, 1);
+    bodySplitter->setSizes({780, 480});
 
-    auto* bottom = new QHBoxLayout();
-    bottom->setSpacing(16);
-    static RGBService rgb;
-    bottom->addWidget(new RGBPanelWidget(&rgb, this), 2);
-    bottom->addWidget(new RGBPreviewWidget(this));
-    bottom->addWidget(new StatsPanelWidget(this), 1);
-    root->addLayout(bottom);
+    root->addWidget(bodySplitter, 1);
 
     connect(m_macroCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DeviceCenterPage::syncPanelFromMacro);
     connect(m_cpsSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &DeviceCenterPage::onCpsChanged);
@@ -171,25 +231,15 @@ DeviceCenterPage::DeviceCenterPage(QWidget* parent) : QWidget(parent)
         const int idx = m_macroCombo->currentIndex();
         if (idx < 0 || idx >= macros.size()) return;
         macros[idx].active = on;
-        if (macros[idx].toggle && macros[idx].device == QStringLiteral("mouse") &&
-            macros[idx].keyLabel == QStringLiteral("L1"))
-        {
-            AppStateStore::instance().state().macroMasterEnabled = on;
-            emit EventBus::instance().macroMasterChanged(on);
-        }
+        if (isMasterToggle(macros[idx].keyLabel, macros[idx].toggle))
+            MacroEngine::instance().setMasterEnabled(on);
     });
     connect(test, &QPushButton::clicked, this, [this]() {
         auto& macros = MacroService::instance().activeMacros();
         const int idx = m_macroCombo->currentIndex();
         if (idx < 0 || idx >= macros.size()) return;
-        if (macros[idx].toggle && macros[idx].keyLabel == QStringLiteral("L1"))
-        {
-            const bool next = !AppStateStore::instance().state().macroMasterEnabled;
-            AppStateStore::instance().state().macroMasterEnabled = next;
-            m_activeToggle->setChecked(next);
-            macros[idx].active = next;
-            emit EventBus::instance().macroMasterChanged(next);
-        }
+        if (isMasterToggle(macros[idx].keyLabel, macros[idx].toggle))
+            toggleMacroMaster();
     });
     connect(save, &QPushButton::clicked, this, [this]() {
         auto& macros = MacroService::instance().activeMacros();
@@ -228,11 +278,18 @@ DeviceCenterPage::DeviceCenterPage(QWidget* parent) : QWidget(parent)
         }
     });
 
-    connect(mouseWidget, &MouseWidget::buttonSelected, this, [this, deviceCombo](const QString& btn) {
+    connect(m_l2LaunchBtn, &QPushButton::clicked, this, &DeviceCenterPage::toggleMacroMaster);
+
+    connect(m_mouseWidget, &MouseWidget::macroToggleRequested, this, &DeviceCenterPage::toggleMacroMaster);
+
+    connect(m_mouseWidget, &MouseWidget::buttonSelected, this, [this, deviceCombo](const QString& btn) {
         m_mouseMode = true;
         m_mouseButton = btn;
         deviceCombo->setCurrentText(QStringLiteral("Elite M40"));
         updatePanelHeader();
+        if (m_l2LaunchBtn)
+            m_l2LaunchBtn->setVisible(btn.compare(QStringLiteral("L2"), Qt::CaseInsensitive) == 0);
+        updateL2LaunchButton();
         const auto& macros = MacroService::instance().activeMacros();
         for (int i = 0; i < macros.size(); ++i)
         {
@@ -256,22 +313,30 @@ DeviceCenterPage::DeviceCenterPage(QWidget* parent) : QWidget(parent)
 
     connect(&EventBus::instance(), &EventBus::profileChanged, this, &DeviceCenterPage::refreshProfile);
     connect(&EventBus::instance(), &EventBus::macroMasterChanged, this, [this](bool on) {
-        if (m_activeToggle && m_toggleHint && m_toggleHint->isVisible())
+        if (m_activeToggle)
             m_activeToggle->setChecked(on);
+        if (m_toggleHint)
+            m_toggleHint->setVisible(m_mouseMode && m_mouseButton == QStringLiteral("L2"));
+        if (m_mouseWidget)
+            m_mouseWidget->setMacroMasterEnabled(on);
+        updateL2LaunchButton();
     });
 
-    mouseWidget->selectButtonByLabel(QStringLiteral("L1"));
+    m_mouseWidget->selectButtonByLabel(QStringLiteral("L2"));
     m_mouseMode = true;
-    m_mouseButton = QStringLiteral("L1");
+    m_mouseButton = QStringLiteral("L2");
     deviceCombo->setCurrentText(QStringLiteral("Elite M40"));
     updatePanelHeader();
+    m_l2LaunchBtn->setVisible(true);
+    m_toggleHint->setVisible(true);
+    updateL2LaunchButton();
 
     reloadMacroList(0);
     const auto& macros = MacroService::instance().activeMacros();
     for (int i = 0; i < macros.size(); ++i)
     {
         if (macros[i].device == QStringLiteral("mouse") &&
-            macros[i].keyLabel == QStringLiteral("L1"))
+            macros[i].keyLabel == QStringLiteral("L2") && macros[i].toggle)
         {
             reloadMacroList(i);
             break;
@@ -337,9 +402,14 @@ void DeviceCenterPage::syncPanelFromMacro(int index)
     m_delaySpin->blockSignals(false);
 
     m_activeToggle->setChecked(m.toggle ? AppStateStore::instance().state().macroMasterEnabled : m.active);
-    m_toggleHint->setVisible(m.toggle);
-    if (m.toggle && m.keyLabel == QStringLiteral("L1"))
-        m_toggleHint->setText(QStringLiteral("Bouton lateral L1 (XButton1) : active/desactive les autoclicks 1-2-3-4"));
+    m_toggleHint->setVisible(m.toggle && isMasterToggle(m.keyLabel, m.toggle));
+    if (m.toggle && isMasterToggle(m.keyLabel, m.toggle))
+        m_toggleHint->setText(QStringLiteral("Bouton lateral L2 (XButton2) : cliquer sur L2 souris pour ON / OFF"));
+
+    const bool showL2 = m_mouseMode && m_mouseButton.compare(QStringLiteral("L2"), Qt::CaseInsensitive) == 0;
+    if (m_l2LaunchBtn)
+        m_l2LaunchBtn->setVisible(showL2);
+    updateL2LaunchButton();
 
     if (m.device == QStringLiteral("mouse"))
     {
@@ -400,4 +470,30 @@ void DeviceCenterPage::updatePanelHeader()
         m_panelHeader->setText(QStringLiteral("TOUCHE %1").arg(m_keyLabel.toUpper()));
         m_targetLabel->setText(QStringLiteral("Touche %1").arg(m_keyLabel.toUpper()));
     }
+
+    if (m_l2LaunchBtn && m_mouseMode)
+        m_l2LaunchBtn->setVisible(m_mouseButton.compare(QStringLiteral("L2"), Qt::CaseInsensitive) == 0);
+}
+
+bool DeviceCenterPage::isMasterToggle(const QString& keyLabel, bool toggleFlag)
+{
+    return toggleFlag && keyLabel.compare(QStringLiteral("L2"), Qt::CaseInsensitive) == 0;
+}
+
+void DeviceCenterPage::toggleMacroMaster()
+{
+    MacroEngine::instance().toggleMaster();
+}
+
+void DeviceCenterPage::updateL2LaunchButton()
+{
+    if (!m_l2LaunchBtn)
+        return;
+
+    const bool on = AppStateStore::instance().state().macroMasterEnabled;
+    m_l2LaunchBtn->setText(on ? QStringLiteral("L2 — MACROS ON")
+                              : QStringLiteral("L2 — MACROS OFF"));
+    m_l2LaunchBtn->setProperty("macroOn", on);
+    m_l2LaunchBtn->style()->unpolish(m_l2LaunchBtn);
+    m_l2LaunchBtn->style()->polish(m_l2LaunchBtn);
 }

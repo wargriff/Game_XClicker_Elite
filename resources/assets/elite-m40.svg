@@ -20,7 +20,7 @@
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
-  <!-- Elite M40  souris gaming symétrique -->
+  <!-- Elite M40  souris gaming symï¿½trique -->
   <ellipse cx="180" cy="420" rx="95" ry="18" fill="#000" opacity="0.35"/>
   <path d="M180 36 C248 36 298 92 298 188 L298 292 C298 362 248 418 180 428 C112 418 62 362 62 292 L62 188 C62 92 112 36 180 36 Z"
         fill="url(#shellTop)" stroke="#3498db" stroke-width="2.8"/>

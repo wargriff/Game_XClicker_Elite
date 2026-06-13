@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e02626"/>
+      <stop offset="100%" stop-color="#a01818"/>
+    </linearGradient>
+    <linearGradient id="b" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5dade2"/>
+      <stop offset="100%" stop-color="#3498db"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="8" width="64" height="64" rx="14" fill="#101016" stroke="url(#g)" stroke-width="2"/>
+  <text x="36" y="52" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="28" font-weight="800" fill="url(#g)">G</text>
+  <text x="88" y="38" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#f4f4f8">Game</text>
+  <text x="88" y="62" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="url(#b)">macro_elite</text>
+  <rect x="88" y="68" width="180" height="3" rx="1.5" fill="url(#g)" opacity="0.8"/>
+</svg>

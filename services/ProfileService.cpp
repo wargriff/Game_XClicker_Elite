@@ -31,4 +31,5 @@ void ProfileService::applyProfile(int index)
     MacroService::instance().syncMacroCount();
 
     emit EventBus::instance().profileChanged(index);
+    emit EventBus::instance().macroMasterChanged(false);
 }

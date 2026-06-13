@@ -1,54 +1,75 @@
 QWidget#titleBar {
-    background-color: #0c0c10;
-    border-bottom: 1px solid #1c1c26;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 rgba(20, 14, 16, 250), stop:1 rgba(10, 8, 10, 250));
+    border-bottom: 1px solid rgba(80, 30, 36, 100);
+}
+
+QFrame#titleBarBrand {
+    background: transparent;
+    border-right: 1px solid #22222e;
+}
+
+QLabel#titleBarAppName {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
 }
 
 QLabel#titleBarSection {
-    font-size: 14px;
+    color: #3498db;
+    font-size: 11px;
     font-weight: 600;
-    color: #888898;
 }
 
-QLabel#titleBarProfile {
-    color: #c0c0cc;
-    font-size: 13px;
-    font-weight: 500;
+QFrame#titleBarStrip {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #101018, stop:1 #12121a);
+    border: 1px solid #2a2a38;
+    border-radius: 10px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+QFrame#titleBarSep {
+    background-color: #2e2e3a;
+    border: none;
 }
 
 QFrame#titleBarEngine {
-    background-color: #101016;
-    border: 1px solid #22222e;
-    border-radius: 10px;
+    background-color: #0e0e14;
+    border: 1px solid #252530;
+    border-radius: 8px;
 }
 
 QLabel#titleBarEngineLabel {
-    color: #707080;
-    font-size: 10px;
+    color: #606070;
+    font-size: 9px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
 }
 
 QLabel#titleBarEngineBadge {
     color: #2ecc71;
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 9px;
+    font-weight: 800;
     background-color: #142818;
     border: 1px solid #1e4028;
-    border-radius: 8px;
-    padding: 2px 8px;
+    border-radius: 6px;
+    padding: 3px 8px;
 }
 
 QLabel#titleBarEngineBadge[running="true"] {
-    color: #3498db;
-    background-color: #141824;
-    border-color: #2a5080;
+    color: #ffffff;
+    background-color: #e02626;
+    border-color: #ff3b3b;
 }
 
 QLabel#titleBarMeterLabel {
     color: #606070;
-    font-size: 9px;
-    font-weight: 600;
-    min-width: 28px;
+    font-size: 8px;
+    font-weight: 700;
+    min-width: 26px;
 }
 
 QProgressBar#titleBarMeterBar {
@@ -69,39 +90,80 @@ QProgressBar#titleBarMeterBar[accent="ram"]::chunk {
 
 QLabel#titleBarVersion {
     color: #505060;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
+    padding-left: 4px;
 }
 
-QPushButton#titleBarChangeBtn {
-    color: #3498db;
-    font-size: 11px;
-    font-weight: 700;
+QLabel#titleBarGameLabel {
+    color: #707080;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+QComboBox#titleBarGameCombo {
+    color: #f4f4f8;
+    font-size: 12px;
+    font-weight: 600;
     padding: 4px 10px;
-    border: 1px solid #2a5080;
-    border-radius: 6px;
-    background: #141824;
+    border: 1px solid #2e2e3a;
+    border-radius: 7px;
+    background: #0e0e14;
+    min-height: 28px;
 }
 
-QPushButton#titleBarChangeBtn:hover {
-    color: #5dade2;
+QComboBox#titleBarGameCombo:hover,
+QComboBox#titleBarGameCombo:focus {
     border-color: #3498db;
 }
 
-QPushButton#titleBarBtn {
+QComboBox#titleBarGameCombo::drop-down {
+    border: none;
+    width: 24px;
+}
+
+QComboBox#titleBarGameCombo::down-arrow {
+    image: none;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #3498db;
+    margin-right: 8px;
+}
+
+QComboBox#titleBarGameCombo QAbstractItemView {
+    background: #101016;
+    color: #f4f4f8;
+    border: 1px solid #3498db;
+    border-radius: 8px;
+    padding: 4px;
+    selection-background-color: #2a5080;
+    min-width: 280px;
+}
+
+QComboBox#titleBarGameCombo QAbstractItemView::item {
+    min-height: 28px;
+    padding: 4px 8px;
+}
+
+QFrame#titleBarChrome {
+    background: #0a0a10;
+    border-left: 1px solid #22222e;
+}
+
+QPushButton#windowChromeBtn {
     background: transparent;
     border: none;
-    color: #888898;
-    font-size: 14px;
-    border-radius: 4px;
+    border-left: 1px solid #1a1a22;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
 }
 
-QPushButton#titleBarBtn:hover {
-    background-color: #22222c;
-    color: #ffffff;
+QPushButton#windowChromeBtn:hover {
+    background: #282834;
 }
 
-QPushButton#titleBarBtn:last-child:hover {
-    background-color: #e02626;
-    color: #ffffff;
+QPushButton#windowChromeBtn[chromeKind="close"]:hover {
+    background: #e02626;
 }

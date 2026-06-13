@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 280">
+  <ellipse cx="210" cy="140" rx="160" ry="100" fill="#181820" stroke="#3498db" stroke-width="2.5"/>
+  <rect x="40" y="90" width="24" height="50" rx="6" fill="#14141c" stroke="#ff8c2a" stroke-width="2"/>
+  <text x="52" y="122" font-size="10" font-weight="700" fill="#ff8c2a">L1</text>
+  <rect x="40" y="148" width="24" height="50" rx="6" fill="#14141c" stroke="#ff8c2a" stroke-width="2"/>
+  <text x="52" y="180" font-size="10" font-weight="700" fill="#ff8c2a">L2</text>
+  <text x="210" y="155" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="24" font-weight="800" fill="#3498db">ELITE M40</text>
+</svg>

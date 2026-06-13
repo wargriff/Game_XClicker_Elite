@@ -35,24 +35,24 @@ ProfileManagerPage::ProfileManagerPage(QWidget* parent) : QWidget(parent)
 
     auto* hero = new QFrame(this);
     hero->setObjectName(QStringLiteral("profileHero"));
-    auto* heroLayout = new QHBoxLayout(hero);
-    heroLayout->setContentsMargins(24, 20, 24, 20);
+    auto* heroLayout = new QVBoxLayout(hero);
+    heroLayout->setContentsMargins(0, 0, 0, 0);
 
-    auto* heroText = new QVBoxLayout();
-    auto* title = new QLabel(QStringLiteral("Profile Manager"), hero);
-    title->setObjectName(QStringLiteral("pageTitle"));
-    auto* subtitle = new QLabel(
-        QStringLiteral("Un profil = un jeu. Macros, peripheriques et eclairage sauvegardes automatiquement."),
-        hero);
-    subtitle->setObjectName(QStringLiteral("pageSubtitle"));
-    subtitle->setWordWrap(true);
-    heroText->addWidget(title);
-    heroText->addWidget(subtitle);
-    heroLayout->addLayout(heroText, 1);
+    auto* banner = new QLabel(hero);
+    banner->setObjectName(QStringLiteral("pageBanner"));
+    banner->setPixmap(AssetGenerator::instance().pixmap(
+        QStringLiteral("assets/banners/banner-profiles.svg"), QSize(900, 120)));
+    banner->setScaledContents(true);
+    banner->setFixedHeight(120);
+    heroLayout->addWidget(banner);
 
+    auto* heroActions = new QHBoxLayout();
+    heroActions->setContentsMargins(24, 0, 24, 12);
+    heroActions->addStretch();
     auto* newBtn = new QPushButton(QStringLiteral("+ Nouveau profil"), hero);
     newBtn->setObjectName(QStringLiteral("primaryButton"));
-    heroLayout->addWidget(newBtn, 0, Qt::AlignTop);
+    heroActions->addWidget(newBtn, 0, Qt::AlignTop);
+    heroLayout->addLayout(heroActions);
     root->addWidget(hero);
 
     const ProfileModel model = ProfileService::instance().model();

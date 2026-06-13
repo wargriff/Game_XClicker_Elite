@@ -1,0 +1,35 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 17,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "ninja-multi",
+      "displayName": "Ninja Multi-Config (Game_macro_elite)",
+      "description": "build/Debug + build/Release, sans ZERO_CHECK ni x64",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "C:/Qt/6.8.0/msvc2022_64",
+        "GMEL_QT_ROOT": "C:/Qt/6.8.0/msvc2022_64"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "release",
+      "displayName": "Build Release",
+      "configurePreset": "ninja-multi",
+      "configuration": "Release"
+    },
+    {
+      "name": "debug",
+      "displayName": "Build Debug",
+      "configurePreset": "ninja-multi",
+      "configuration": "Debug"
+    }
+  ]
+}

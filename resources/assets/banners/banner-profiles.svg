@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#141824"/>
+      <stop offset="100%" stop-color="#0a0a0c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="280" rx="16" fill="url(#g)" stroke="#282834"/>
+  <text x="40" y="80" font-family="Segoe UI,sans-serif" font-size="36" font-weight="700" fill="#f4f4f8">Profils de jeu</text>
+  <text x="40" y="130" font-family="Segoe UI,sans-serif" font-size="18" fill="#9090a0">Diablo - WoW - Valorant - macros par jeu</text>
+  <circle cx="1020" cy="140" r="70" fill="#14141c" stroke="#e02626" stroke-width="3"/>
+  <text x="1020" y="155" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="32" font-weight="800" fill="#e02626">D4</text>
+</svg>

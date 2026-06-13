@@ -26,6 +26,6 @@
   </g>
   <circle cx="3200" cy="400" r="300" fill="#e02626" opacity="0.06" filter="url(#blur)"/>
   <circle cx="600" cy="1700" r="400" fill="#3498db" opacity="0.04" filter="url(#blur)"/>
-  <text x="1920" y="1100" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="180" font-weight="700" fill="#f0f0f5" opacity="0.04">GAMEX</text>
+  <text x="1920" y="1100" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="120" font-weight="700" fill="#f0f0f5" opacity="0.04">Game_macro_elite</text>
   <rect x="0" y="2140" width="3840" height="20" fill="#e02626" opacity="0.6"/>
 </svg>

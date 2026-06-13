@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QColor>
+#include <QPixmap>
 #include <QPropertyAnimation>
 #include <QRectF>
 #include <QString>
@@ -17,9 +18,11 @@ public:
 
     QString selectedButton() const { return m_selectedButton; }
     void selectButtonByLabel(const QString& label);
+    void setMacroMasterEnabled(bool enabled);
 
 signals:
     void buttonSelected(const QString& button);
+    void macroToggleRequested();
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -33,25 +36,24 @@ private:
 
     int hitTest(const QPoint& p) const;
     int indexForLabel(const QString& label) const;
-    QRectF svgRect() const;
-    float svgScale() const;
-    QRectF zoneRect(int index, const QRectF& sr, float s) const;
+    QRectF imageRect() const;
+    QRectF zoneRect(int index, const QRectF& imageArea) const;
+    void loadPhoto();
     void applySelection(int index);
 
-    QString m_selectedButton = QStringLiteral("L1");
-    int m_selectedIndex = 3;
+    QString m_selectedButton = QStringLiteral("L2");
+    int m_selectedIndex = 4;
     int m_hoveredIndex = -1;
+    bool m_macroMasterEnabled = false;
     qreal m_pulsePhase = 0.0;
     QPropertyAnimation* m_pulseAnim = nullptr;
+    QPixmap m_topPhoto;
 
     struct BtnZone {
-        QRectF rect;
+        QRectF normRect;
         QString label;
         QColor accent;
         bool macroSide = false;
     };
     QVector<BtnZone> m_zones;
-
-    static constexpr float kSvgW = 420.f;
-    static constexpr float kSvgH = 580.f;
 };

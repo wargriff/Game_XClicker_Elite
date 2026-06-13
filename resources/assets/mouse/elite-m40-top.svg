@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 480">
+  <defs>
+    <linearGradient id="b" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#343440"/>
+      <stop offset="100%" stop-color="#0e0e14"/>
+    </linearGradient>
+  </defs>
+  <path d="M180 36 C248 36 298 92 298 188 L298 292 C298 362 248 418 180 428 C112 418 62 362 62 292 L62 188 C62 92 112 36 180 36 Z" fill="url(#b)" stroke="#3498db" stroke-width="3"/>
+  <line x1="180" y1="58" x2="180" y2="130" stroke="#3498db" stroke-width="2"/>
+  <rect x="52" y="178" width="32" height="42" rx="6" fill="#181820" stroke="#ff8c2a" stroke-width="2"/>
+  <text x="68" y="204" text-anchor="middle" font-size="11" font-weight="700" fill="#ff8c2a">L1</text>
+  <rect x="52" y="224" width="32" height="42" rx="6" fill="#181820" stroke="#ff8c2a" stroke-width="2"/>
+  <text x="68" y="250" text-anchor="middle" font-size="11" font-weight="700" fill="#ff8c2a">L2</text>
+  <rect x="162" y="148" width="36" height="62" rx="10" fill="#0c0c12" stroke="#3498db" stroke-width="2"/>
+  <text x="180" y="400" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="28" font-weight="800" fill="#3498db">M40</text>
+</svg>
